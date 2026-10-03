@@ -53,10 +53,10 @@ def run():
             for p in (ROOT/d).rglob('*') if p.is_file() and p.suffix not in {'.pyc','.duckdb','.joblib'}}
         candidates-= {'artifacts/tables/test_predictions.csv','artifacts/tables/shap_local.csv','artifacts/tables/pytest_output.txt',
                      'artifacts/tables/streamlit_server_output.txt','artifacts/tables/pytest_results.xml'}
-    # A clean pipeline intentionally deletes old generated audit tables. Git's index
+    # A clean pipeline intentionally deletes old generated tables and figures. Git's index
     # still lists them until the next staging operation; they are not upload candidates.
     absent=[name for name in candidates if not (ROOT/name).is_file()]
-    assert all(name.startswith('artifacts/tables/') for name in absent),f'Missing source files: {absent}'
+    assert all(name.startswith(('artifacts/tables/','artifacts/figures/')) for name in absent),f'Missing source files: {absent}'
     candidates={name for name in candidates if (ROOT/name).is_file()}
     large=[]
     for name in candidates:
