@@ -1,0 +1,29 @@
+{
+  "checks": [
+    {
+      "component": "Public snapshot integrity",
+      "status": "PASS",
+      "evidence": "6010 scores, events and driver records match saved holdout outputs; policy counts match"
+    },
+    {
+      "component": "Markdown presentation",
+      "status": "PASS",
+      "evidence": "35 local document/image links verified; UTF-8 characters checked"
+    },
+    {
+      "component": "Public demo assets and scope",
+      "status": "PASS",
+      "evidence": "Static entry points, analytical images and educational/public-data scope present"
+    },
+    {
+      "component": "Upload hygiene",
+      "status": "PASS",
+      "evidence": "128 candidate files checked: no environment/raw-model artifacts, credential-shaped values, local user paths or files above size limit"
+    },
+    {
+      "component": "Licensing and exclusions",
+      "status": "PASS",
+      "evidence": "MIT license, dataset NOTICE and source/artifact ignore rules checked"
+    }
+  ]
+}

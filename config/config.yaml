@@ -1,0 +1,5 @@
+﻿seed: 42
+bootstrap_replicates: 300
+threshold_quantiles: [0.50, 0.75, 0.90]
+scenario_lgd: [0.25, 0.45, 0.65]
+scenario_ead_ntd: [50000, 100000, 200000]

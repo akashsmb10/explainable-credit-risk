@@ -1,0 +1,2 @@
+# Optional browser QA for the static public demo; not needed by the ML pipeline.
+playwright==1.55.0

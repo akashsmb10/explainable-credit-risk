@@ -1,0 +1,95 @@
+{
+  "source_sha256": "30c6be3abd8dcfd3e6096c828bad8c2f011238620f5369220bd60cfc82700933",
+  "source_url": "https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients",
+  "rows": 30000,
+  "columns": 25,
+  "events": 6636,
+  "event_rate": 0.2212,
+  "missing_cells": 0,
+  "duplicate_profiles": 56,
+  "duplicate_rows": 0,
+  "negative_bill_cells": 3932,
+  "undocumented_education_rows": 345,
+  "undocumented_marriage_rows": 54,
+  "repayment_minus_two_cells": 24415,
+  "partitions": {
+    "test": {
+      "n": 6010,
+      "events": 1314,
+      "event_rate": 0.21863560732113144
+    },
+    "validation": {
+      "n": 6015,
+      "events": 1359,
+      "event_rate": 0.22593516209476308
+    },
+    "calibration": {
+      "n": 6049,
+      "events": 1322,
+      "event_rate": 0.21854852041659778
+    },
+    "train": {
+      "n": 11926,
+      "events": 2641,
+      "event_rate": 0.221448935099782
+    }
+  },
+  "selected": "xgboost:sigmoid",
+  "selection_rule": "minimum validation Brier, tie break log loss",
+  "test_metrics": {
+    "roc_auc": 0.7808399064977091,
+    "average_precision": 0.5590732224717525,
+    "precision": 0.520387007601935,
+    "recall": 0.5730593607305936,
+    "f1": 0.5454545454545454,
+    "ks": 0.430193188801506,
+    "brier": 0.13250766735645844,
+    "log_loss": 0.4241676671657964,
+    "tn": 4002,
+    "fp": 694,
+    "fn": 561,
+    "tp": 753,
+    "threshold": 0.2839901475140817
+  },
+  "band_boundaries": [
+    0.14707765807900644,
+    0.2839901475140817,
+    0.5722191552185503
+  ],
+  "review_threshold": 0.2839901475140817,
+  "representative_ids": {
+    "low": 3857,
+    "medium": 9623,
+    "high": 8920,
+    "borderline": 9791
+  },
+  "shap_max_additivity_error": 2.384185791015625e-06,
+  "sql_rows": {
+    "01_portfolio_overview.sql": 4,
+    "02_risk_segmentation.sql": 4,
+    "03_monitoring_queries.sql": 8,
+    "04_risk_deciles.sql": 10,
+    "05_high_risk_exposure.sql": 2
+  },
+  "execution_utc": "2026-10-03T09:31:43.617147+00:00",
+  "python": "3.12.10",
+  "configuration": {
+    "seed": 42,
+    "bootstrap_replicates": 300,
+    "threshold_quantiles": [
+      0.5,
+      0.75,
+      0.9
+    ],
+    "scenario_lgd": [
+      0.25,
+      0.45,
+      0.65
+    ],
+    "scenario_ead_ntd": [
+      50000,
+      100000,
+      200000
+    ]
+  }
+}

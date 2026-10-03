@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore verified credit-risk model results, SHAP explanations, review trade-offs and assumed-loss scenarios. An educational banking analytics portfolio.">
+  <meta name="theme-color" content="#142d38">
+  <title>Explainable Credit Risk · Portfolio Explorer</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <aside class="sidebar">
+    <a class="brand" href="#overview" aria-label="Explainable Credit Risk home"><span class="brand-mark">↗</span><span>Explainable<br><strong>Credit Risk</strong></span></a>
+    <p class="sidebar-label">PORTFOLIO EXPLORER</p>
+    <nav aria-label="Dashboard sections">
+      <button data-page="overview" aria-current="page"><span>01</span> Portfolio overview</button>
+      <button data-page="distribution"><span>02</span> Risk distribution</button>
+      <button data-page="applicant"><span>03</span> Cardholder explorer</button>
+      <button data-page="performance"><span>04</span> Model performance</button>
+      <button data-page="explainability"><span>05</span> Explainability</button>
+      <button data-page="decisions"><span>06</span> Decision simulator</button>
+      <button data-page="loss"><span>07</span> Loss scenarios</button>
+    </nav>
+    <div class="sidebar-bottom"><span class="status-dot"></span> Verified results snapshot<br><small>UCI · Taiwan · Historical cardholders</small><a href="https://github.com/akashsmb10/explainable-credit-risk" target="_blank" rel="noopener noreferrer">View source on GitHub ↗</a></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><span><span class="status-dot"></span> Educational decision support</span><a href="https://github.com/akashsmb10/explainable-credit-risk/blob/main/reports/model_card.md" target="_blank" rel="noopener noreferrer">Model card ↗</a></header>
+    <main id="main" tabindex="-1">
+      <div id="loading" role="status">Loading verified results…</div>
+      <div id="content" hidden></div>
+      <noscript>This interactive explorer requires JavaScript. Read the complete verified reports in the GitHub repository.</noscript>
+    </main>
+    <footer><strong>Scope matters.</strong> Scores estimate the dataset’s next-month default-payment label. This is not bank underwriting advice or ICICI policy. LGD and EAD are assumptions; explanations are non-causal.<br><a href="https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients" target="_blank" rel="noopener noreferrer">Dataset: Yeh (2009), UCI · CC BY 4.0 ↗</a><span>Frozen holdout explorer · Full Streamlit app in the repository</span></footer>
+  </div>
+</body>
+</html>

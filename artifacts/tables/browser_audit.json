@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "target": "local demo",
+  "checks": [
+    "Loaded snapshot matches executed source hash and test metrics",
+    "Desktop page rendered: overview",
+    "Desktop page rendered: distribution",
+    "Desktop page rendered: applicant",
+    "Desktop page rendered: performance",
+    "Desktop page rendered: explainability",
+    "Desktop page rendered: decisions",
+    "Desktop page rendered: loss",
+    "Frozen policy counts, threshold endpoints and exact reset passed",
+    "Loss scaling, zero exposure and invalid negative-exposure handling passed",
+    "Mobile page fits viewport: overview",
+    "Mobile page fits viewport: distribution",
+    "Mobile page fits viewport: applicant",
+    "Mobile page fits viewport: performance",
+    "Mobile page fits viewport: explainability",
+    "Mobile page fits viewport: decisions",
+    "Mobile page fits viewport: loss"
+  ],
+  "page_errors": []
+}

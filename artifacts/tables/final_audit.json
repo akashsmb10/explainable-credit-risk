@@ -1,0 +1,67 @@
+[
+  {
+    "component": "Source provenance and data validation",
+    "status": "PASS",
+    "evidence": "Verified 30000 rows, schema, ID uniqueness, target and SHA256"
+  },
+  {
+    "component": "Saved artifact loading and metrics integrity",
+    "status": "PASS",
+    "evidence": "Replayed all test scores, bands, scenario losses and final metrics from the saved model"
+  },
+  {
+    "component": "Train/calibration/validation/test contamination",
+    "status": "PASS",
+    "evidence": "Exact profile hashes and source IDs disjoint across all partitions"
+  },
+  {
+    "component": "Model selection, calibration and explanation",
+    "status": "PASS",
+    "evidence": "Validation-only selection verified; TreeSHAP raw-margin additivity verified"
+  },
+  {
+    "component": "Executable SQL",
+    "status": "PASS",
+    "evidence": "5 queries executed again and matched saved outputs"
+  },
+  {
+    "component": "Notebook execution",
+    "status": "PASS",
+    "evidence": "8 notebooks with executed code cells and no error outputs"
+  },
+  {
+    "component": "Complete pytest suite and dashboard AppTest",
+    "status": "PASS",
+    "evidence": "27 tests passed, including all Streamlit pages and slider endpoint"
+  },
+  {
+    "component": "Streamlit HTTP launch and health",
+    "status": "PASS",
+    "evidence": "Local server health and HTML endpoint returned HTTP 200; temporary process stopped after check"
+  },
+  {
+    "component": "README, reports and resume numeric source consistency",
+    "status": "PASS",
+    "evidence": "8 deterministic documents verified; interview guide and exactly three resume bullets checked"
+  },
+  {
+    "component": "Unfinished implementation marker scan",
+    "status": "PASS",
+    "evidence": "No unresolved implementation markers in source, app, tests, SQL or documentation"
+  },
+  {
+    "component": "Reproducible dependencies",
+    "status": "PASS",
+    "evidence": "Pinned direct packages match environment and pip check has no dependency conflicts; full requirements-lock.txt recorded"
+  },
+  {
+    "component": "File paths, README commands and ignore rules",
+    "status": "PASS",
+    "evidence": "README local links, entry points and required data/model/environment ignore rules verified"
+  },
+  {
+    "component": "Decision / loss / monitoring assumptions labelled",
+    "status": "PASS",
+    "evidence": "Explicit capacity, loss-input, educational-use and random/synthetic-monitoring labels checked in generated docs and app"
+  }
+]

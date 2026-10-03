@@ -1,0 +1,5 @@
+﻿# Model scope and limitations
+
+Educational existing-cardholder risk decision support, not ICICI underwriting advice. Historical Taiwan clients are not representative of modern Indian borrowers. An observational sample gives associations, not causal effects. Demographics will be retained for subgroup audit but excluded from scoring; proxy discrimination remains possible. Undocumented repayment codes will be retained as categorical values without invented meanings. Negative statements can represent account credits and are not automatically invalid.
+
+There are no cohort dates enabling genuine out-of-time validation, no rejected applicants, and no contractual default/recovery information. Random holdouts assess same-sample generalization only. Exact duplicate predictor profiles will be grouped across partitions. Calibration and model selection will use distinct non-test sets. Test labels must not drive thresholds, features or model choices. LGD and EAD will be labelled scenario assumptions in NT dollars. No profit, production fairness or regulatory compliance claim is supported.

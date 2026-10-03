@@ -1,0 +1,7 @@
+feature,comparison,psi,train_missing,test_missing
+LIMIT_BAL,random train versus test,0.0034575544804262585,0.0,0.0
+utilization_latest,random train versus test,0.0017794833224636035,0.0,0.0
+payment_to_limit,random train versus test,0.006033122637521054,0.0,0.0
+months_delayed,random train versus test,0.0006360238287400525,0.0,0.0
+score,random train versus test,0.0026196833738221,0.0,0.0
+LIMIT_BAL,synthetic 1.5x limit shift versus test,0.726761280435535,0.0,0.0

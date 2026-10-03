@@ -1,0 +1,14 @@
+Dataset attribution
+
+Yeh, I. (2009). Default of Credit Card Clients.
+UCI Machine Learning Repository. https://doi.org/10.24432/C55S3H
+Source: https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients
+Dataset license: Creative Commons Attribution 4.0 International (CC BY 4.0).
+https://creativecommons.org/licenses/by/4.0/
+
+The project renames the source target, engineers behavioural features and
+produces model-estimated scores, statistical tables, explanations and a
+public held-out results snapshot. These derived outputs do not imply
+endorsement by the dataset creators, UCI, GitHub or ICICI Bank.
+
+The MIT license applies to project code, not to the original dataset.
