@@ -63,8 +63,8 @@ Statistical significance differs from usefulness; effect size and holdout trade-
 | age_band | above 45 | 903 | 230 | 0.2547 | 0.7947 | 0.1435 | -0.0162 | 0.1634 | 0.3696 | 0.7176 |
 
 No fairness certification follows; subgroup differences and sample uncertainty require bank-specific investigation.
-12. **Tests:** 27 tests passed, including all Streamlit pages and slider endpoint.
-13. **Dashboard:** all seven pages passed programmatic rendering. HTTP health and HTML endpoints returned success during a temporary local launch; the audit server was then stopped. Run the command below for an interactive local Streamlit dashboard. No cloud publication is claimed.
+12. **Tests:** 28 tests passed, including all Streamlit pages and slider endpoint.
+13. **Dashboard:** all seven pages passed programmatic rendering. HTTP health and HTML endpoints returned success during a temporary local launch; the audit server was then stopped. Run the command below for an interactive local Streamlit dashboard. Public frozen-results demo: https://akashsmb10.github.io/explainable-credit-risk/ (publication verified). This is not a hosted Streamlit process.
 14. **Reproduction commands (PowerShell, repository root):**
 
 ```powershell

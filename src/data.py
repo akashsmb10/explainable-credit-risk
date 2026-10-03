@@ -14,6 +14,7 @@ SOURCE = 'https://archive.ics.uci.edu/static/public/350/default+of+credit+card+c
 
 def load_data():
     path = ROOT / 'data/raw/credit.xls'
+    path.parent.mkdir(parents=True,exist_ok=True)
     if not path.exists():
         request = urllib.request.Request(SOURCE, headers={'User-Agent': 'credit-risk-portfolio/1.0'})
         payload = urllib.request.urlopen(request, timeout=120).read()

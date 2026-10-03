@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "target": "local demo",
+  "target": "public deployment",
   "checks": [
     "Loaded snapshot matches executed source hash and test metrics",
     "Desktop page rendered: overview",

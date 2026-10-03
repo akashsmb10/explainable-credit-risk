@@ -18,7 +18,7 @@
     {
       "component": "Upload hygiene",
       "status": "PASS",
-      "evidence": "128 candidate files checked: no environment/raw-model artifacts, credential-shaped values, local user paths or files above size limit"
+      "evidence": "131 candidate files checked: no environment/raw-model artifacts, credential-shaped values, local user paths or files above size limit"
     },
     {
       "component": "Licensing and exclusions",

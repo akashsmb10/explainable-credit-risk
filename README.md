@@ -4,7 +4,7 @@
 
 **A reproducible banking analytics portfolio that turns repayment histories into explainable risk estimates and transparent review simulations.**
 
-**Interactive demo:** prepared for GitHub Pages; publication is not yet verified. · [Model card](reports/model_card.md) · [Executive summary](reports/executive_summary.md) · [Technical methodology](docs/technical_methodology.md)
+[**Open live interactive demo ↗**](https://akashsmb10.github.io/explainable-credit-risk/) · [Model card](reports/model_card.md) · [Executive summary](reports/executive_summary.md) · [Technical methodology](docs/technical_methodology.md)
 
 Python · scikit-learn · XGBoost · SHAP · DuckDB / SQL · Streamlit · pytest
 

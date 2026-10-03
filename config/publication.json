@@ -1,0 +1,10 @@
+{
+  "repository_url": "https://github.com/akashsmb10/explainable-credit-risk",
+  "demo_url": "https://akashsmb10.github.io/explainable-credit-risk/",
+  "verified_live": true,
+  "verified_utc": "2026-10-03T09:59:33.629696+00:00",
+  "source_sha256": "30c6be3abd8dcfd3e6096c828bad8c2f011238620f5369220bd60cfc82700933",
+  "snapshot_clients": 6010,
+  "hosting": "GitHub Pages",
+  "demo_type": "static frozen-results explorer; not a hosted Streamlit process"
+}

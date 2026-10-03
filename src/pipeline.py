@@ -29,6 +29,8 @@ def chart(name, title, xlabel, ylabel):
     plt.tight_layout(); plt.savefig(ROOT/'artifacts/figures'/name,dpi=180); plt.close()
 
 def run():
+    for relative in ['data/raw','data/processed','artifacts/models','artifacts/tables','artifacts/figures']:
+        (ROOT/relative).mkdir(parents=True,exist_ok=True)
     config = yaml.safe_load((ROOT/'config/config.yaml').read_text(encoding='utf-8-sig'))
     seed=config['seed']; tables=ROOT/'artifacts/tables'; figures=ROOT/'artifacts/figures'
     plt.rcParams.update({'figure.figsize':(8,5),'font.size':11,'axes.spines.top':False,'axes.spines.right':False})

@@ -32,7 +32,7 @@
   {
     "component": "Complete pytest suite and dashboard AppTest",
     "status": "PASS",
-    "evidence": "27 tests passed, including all Streamlit pages and slider endpoint"
+    "evidence": "28 tests passed, including all Streamlit pages and slider endpoint"
   },
   {
     "component": "Streamlit HTTP launch and health",
