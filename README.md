@@ -4,7 +4,7 @@
 
 **A reproducible banking analytics portfolio that turns repayment histories into explainable risk estimates and transparent review simulations.**
 
-[**Open live interactive demo ↗**](https://akashsmb10.github.io/explainable-credit-risk/) · [Model card](reports/model_card.md) · [Executive summary](reports/executive_summary.md) · [Technical methodology](docs/technical_methodology.md)
+**Interactive demo:** prepared for GitHub Pages; publication is not yet verified. · [Model card](reports/model_card.md) · [Executive summary](reports/executive_summary.md) · [Technical methodology](docs/technical_methodology.md)
 
 Python · scikit-learn · XGBoost · SHAP · DuckDB / SQL · Streamlit · pytest
 
@@ -27,7 +27,7 @@ Python · scikit-learn · XGBoost · SHAP · DuckDB / SQL · Streamlit · pytest
 | Source clients | 30,000 |
 | Positive events | 6,636 (22.1%) |
 | Final test clients | 6,010 |
-| Selected model | Sigmoid-calibrated XGBoost |
+| Selected model | xgboost:sigmoid |
 | Test ROC-AUC / average precision | 0.781 / 0.559 |
 | Test KS / Brier score | 0.430 / 0.133 |
 | Review rate / event capture | 24.1% / 57.3% |
@@ -94,8 +94,10 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
 .\.venv\Scripts\python.exe -m src.pipeline --clean
 .\.venv\Scripts\python.exe -m src.notebooks
-.\.venv\Scripts\python.exe -m src.final_audit
 .\.venv\Scripts\python.exe -m src.web_demo
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe -m src.final_audit
+.\.venv\Scripts\python.exe scripts/release_audit.py
 .\.venv\Scripts\python.exe -m streamlit run app/app.py
 ```
 
@@ -109,8 +111,10 @@ python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements-lock.txt
 .venv/bin/python -m src.pipeline --clean
 .venv/bin/python -m src.notebooks
-.venv/bin/python -m src.final_audit
 .venv/bin/python -m src.web_demo
+.venv/bin/python -m pytest -q
+.venv/bin/python -m src.final_audit
+.venv/bin/python scripts/release_audit.py
 .venv/bin/python -m streamlit run app/app.py
 ```
 

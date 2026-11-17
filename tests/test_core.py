@@ -144,3 +144,14 @@ def test_champion_challenger_reporting_preserves_selection(bundle,tmp_path):
     assert summary_path.read_bytes()==before
     validation=pd.read_csv(tables/'validation_models.csv')
     assert summary['selected']==bundle['winner']==validation.sort_values(['brier','log_loss','candidate']).iloc[0].candidate
+
+
+def test_paired_auc_bootstrap_identical_predictions():
+    from src.evaluation import paired_auc_bootstrap
+    y=np.array([0,1,0,1,0,1,0,1])
+    p=np.linspace(.1,.8,len(y))
+    result=paired_auc_bootstrap(y,p,p,repetitions=40,seed=42)
+    for key in ['point_estimate','mean_difference','ci_low','ci_high']:
+        assert result[key]==0
+    assert result['share_le_zero']==1
+    assert 0<result['valid_replicates']<=result['repetitions']

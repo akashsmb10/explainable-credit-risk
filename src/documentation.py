@@ -72,8 +72,10 @@ py -3.12 -m venv .venv
 .\\.venv\\Scripts\\python.exe -m pip install -r requirements-lock.txt
 .\\.venv\\Scripts\\python.exe -m src.pipeline --clean
 .\\.venv\\Scripts\\python.exe -m src.notebooks
+.\\.venv\\Scripts\\python.exe -m src.web_demo
 .\\.venv\\Scripts\\python.exe -m pytest -q
 .\\.venv\\Scripts\\python.exe -m src.final_audit
+.\\.venv\\Scripts\\python.exe scripts/release_audit.py
 .\\.venv\\Scripts\\python.exe -m streamlit run app/app.py
 ```
 

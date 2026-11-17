@@ -71,7 +71,7 @@
     "04_risk_deciles.sql": 10,
     "05_high_risk_exposure.sql": 2
   },
-  "execution_utc": "2026-11-17T08:32:55.438738+00:00",
+  "execution_utc": "2026-11-17T09:03:27.632650+00:00",
   "python": "3.12.10",
   "configuration": {
     "seed": 42,

@@ -101,8 +101,10 @@ def run():
     (ROOT/'artifacts/tables/release_audit.json').write_text(json.dumps(summary,indent=2),encoding='utf-8')
     report='# Publication checks\n\n| Component | Status | Evidence |\n| --- | --- | --- |\n'
     report+='\n'.join(f"| {r['component']} | {r['status']} | {r['evidence']} |" for r in checks)
-    report+='\n\nThis scan checks intentional upload files and saved-result consistency. Browser rendering, slider/scenario behavior and HTTP deployment verification are recorded separately in the browser and deployment audit artifacts. It is not a security certification.\n'
+    report+='\n\nThis scan checks intentional upload files and saved-result consistency. Fresh local browser checks are recorded separately in browser_audit.json when run. Live deployment verification remains pending unless the current snapshot is deployed and independently inspected; historical publication metadata is not verification of this branch. It is not a security certification.\n'
     (ROOT/'reports/publication_audit.md').write_text(report,encoding='utf-8')
+    from src.final_audit import write_manifest
+    write_manifest()
     print(json.dumps(summary,indent=2))
 
 if __name__=='__main__': run()
