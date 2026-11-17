@@ -16,13 +16,31 @@ from .data import ROOT, load_data, audit, split_data
 from .features import engineer, BASE
 from .modeling import build_models
 from .calibration import ProbabilityMap
-from .evaluation import metrics, bootstrap, reliability, psi, wilson
+from .evaluation import metrics, bootstrap, paired_auc_bootstrap, reliability, psi, wilson
 from .decision_engine import risk_bands, threshold_table, expected_loss
 from .statistical_analysis import analyze
 from .explainability import explain, all_local_contributions
 
 def save_json(value, path):
     path.write_text(json.dumps(value,indent=2,allow_nan=False),encoding='utf-8')
+
+def export_champion_challenger(models, test, config, tables):
+    # Descriptive reporting on frozen raw models; no input to model selection.
+    probabilities={name:models[name].predict_proba(test)[:,1] for name in ['logistic','xgboost']}
+    rows=[]
+    for name,p in probabilities.items():
+        result=metrics(test.event,p)
+        deciles=pd.DataFrame({'event':test.event.to_numpy(),'score':p})
+        deciles['decile']=pd.qcut(deciles.score.rank(method='first'),10,labels=False)+1
+        rates=deciles.groupby('decile').event.mean().sort_index()
+        rows.append({'model':name,'roc_auc':result['roc_auc'],'gini':2*result['roc_auc']-1,
+                     'ks':result['ks'],'brier':result['brier'],
+                     'decile_inversions':int((rates.diff().dropna()<0).sum()),
+                     **{f'decile_{i}_event_rate':float(rate) for i,rate in rates.items()}})
+    pd.DataFrame(rows).to_csv(tables/'champion_challenger.csv',index=False)
+    comparison=paired_auc_bootstrap(test.event,probabilities['logistic'],probabilities['xgboost'],
+                                    config['bootstrap_replicates'],config['seed'])
+    save_json(comparison,tables/'champion_challenger_bootstrap.json')
 
 def chart(name, title, xlabel, ylabel):
     plt.title(title); plt.xlabel(xlabel); plt.ylabel(ylabel); plt.grid(alpha=.2)
@@ -87,6 +105,7 @@ def run():
         evaluation.append({'candidate':row['candidate'],**metrics(test.event,p)})
     pd.DataFrame(evaluation).to_csv(tables/'test_models.csv',index=False)
     p=mapper.predict(model.predict_proba(test)[:,1]); final=metrics(test.event,p,threshold)
+    export_champion_challenger(models,test,config,tables)
     intervals=bootstrap(test.event,p,config['bootstrap_replicates'],seed)
     intervals.to_csv(tables/'test_confidence_intervals.csv',index=False)
     curve=reliability(test.event,p); curve.to_csv(tables/'calibration_curve.csv',index=False)
@@ -198,7 +217,8 @@ def run():
         'partitions':split_summary,'selected':winner,'selection_rule':'minimum validation Brier, tie break log loss',
         'test_metrics':final,'band_boundaries':boundaries.tolist(),'review_threshold':threshold,
         'representative_ids':representative,'shap_max_additivity_error':shap_error,'sql_rows':sql_summary,
-        'execution_utc':datetime.now(timezone.utc).isoformat(),'python':platform.python_version(),'configuration':config}
+        'execution_utc':datetime.now(timezone.utc).isoformat(),'python':platform.python_version(),'configuration':config,
+        'reporting_artifacts':['champion_challenger.csv','champion_challenger_bootstrap.json']}
     save_json(summary,tables/'run_summary.json')
     from .documentation import write_documentation
     write_documentation(summary)

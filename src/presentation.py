@@ -20,6 +20,10 @@ def readme(summary):
     chosen=model_comparison[model_comparison.candidate.isin(['base_rate:raw','logistic:raw',summary['selected']])]
     compact=chosen[['candidate','roc_auc','average_precision','brier']].rename(columns={
         'candidate':'Model / probability mapping','roc_auc':'ROC-AUC','average_precision':'Average precision','brier':'Brier score'})
+    challengers=pd.read_csv(tables/'champion_challenger.csv')
+    comparison=json.loads((tables/'champion_challenger_bootstrap.json').read_text())
+    challenger_table=challengers[['model','roc_auc','gini','ks','brier','decile_inversions']].rename(columns={
+        'model':'Model','roc_auc':'ROC-AUC','gini':'Gini','ks':'KS','brier':'Brier score','decile_inversions':'Decile inversions'})
     return f"""# Explainable Credit Risk
 
 ### Retail Credit Risk & Explainable Loan Decision Engine
@@ -62,6 +66,14 @@ Figures are from the saved run; re-running on another OS/XGBoost build can shift
 {table(compact)}
 
 All empirical figures come from executed code. [Run summary](artifacts/tables/run_summary.json), [full model comparisons](artifacts/tables/test_models.csv), [threshold trade-offs](artifacts/tables/threshold_tradeoffs.csv) and [confidence intervals](artifacts/tables/test_confidence_intervals.csv) provide traceability. Review figures are retrospective simulations, not actual approvals or profit improvements.
+
+## Champion–challenger: logistic vs XGBoost
+
+{table(challenger_table)}
+
+XGBoost ranks risk better by ΔAUC {comparison['point_estimate']:.3f} [{comparison['ci_low']:.3f}, {comparison['ci_high']:.3f}] (95% paired-bootstrap interval). Logistic regression rank-orders the deciles more smoothly and is directly interpretable. In a regulated scoring setting, logistic would be the natural champion and XGBoost a challenger.
+
+This compares frozen raw probabilities on the test partition for reporting only; the validation-selected model remains `{summary['selected']}`. Deciles contain equal counts by score rank, from low to high risk; tied scores use source row order. An inversion is an adjacent decline in observed event rate. [Model and decile evidence](artifacts/tables/champion_challenger.csv) and [paired-bootstrap results](artifacts/tables/champion_challenger_bootstrap.json) include the mean ΔAUC and share of replicates at or below zero. Intervals condition on these fitted models and this split.
 
 ## Explore the evidence
 

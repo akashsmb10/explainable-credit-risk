@@ -45,6 +45,17 @@ Figures are from the saved run; re-running on another OS/XGBoost build can shift
 
 All empirical figures come from executed code. [Run summary](artifacts/tables/run_summary.json), [full model comparisons](artifacts/tables/test_models.csv), [threshold trade-offs](artifacts/tables/threshold_tradeoffs.csv) and [confidence intervals](artifacts/tables/test_confidence_intervals.csv) provide traceability. Review figures are retrospective simulations, not actual approvals or profit improvements.
 
+## Champion–challenger: logistic vs XGBoost
+
+| Model | ROC-AUC | Gini | KS | Brier score | Decile inversions |
+| --- | --- | --- | --- | --- | --- |
+| logistic | 0.763 | 0.527 | 0.419 | 0.135 | 0 |
+| xgboost | 0.781 | 0.562 | 0.430 | 0.132 | 1 |
+
+XGBoost ranks risk better by ΔAUC 0.017 [0.010, 0.025] (95% paired-bootstrap interval). Logistic regression rank-orders the deciles more smoothly and is directly interpretable. In a regulated scoring setting, logistic would be the natural champion and XGBoost a challenger.
+
+This compares frozen raw probabilities on the test partition for reporting only; the validation-selected model remains `xgboost:sigmoid`. Deciles contain equal counts by score rank, from low to high risk; tied scores use source row order. An inversion is an adjacent decline in observed event rate. [Model and decile evidence](artifacts/tables/champion_challenger.csv) and [paired-bootstrap results](artifacts/tables/champion_challenger_bootstrap.json) include the mean ΔAUC and share of replicates at or below zero. Intervals condition on these fitted models and this split.
+
 ## Explore the evidence
 
 ![Observed event rates by validation-derived risk band](artifacts/figures/risk_bands.png)
