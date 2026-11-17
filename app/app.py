@@ -40,6 +40,10 @@ def csv(name): return pd.read_csv(ROOT/'artifacts/tables'/name)
 def picture(name): st.image(str(ROOT/'artifacts/figures'/name),width='stretch')
 
 if page=='Portfolio Overview':
+    tradeoffs=csv('threshold_tradeoffs.csv')
+    policy=tradeoffs.iloc[(tradeoffs.threshold-summary['review_threshold']).abs().argmin()]
+    bands=csv('risk_bands.csv').set_index('risk_band')
+    st.write(f"Reviewing the riskiest {policy.review_rate:.1%} of holdout accounts captured {policy.event_capture:.1%} of next-month payment events; risk bands rise from {bands.loc['LOW','event_rate']:.1%} to {bands.loc['VERY HIGH','event_rate']:.1%} observed event rate.")
     a,b,c,d=st.columns(4)
     a.metric('Source clients',f"{summary['rows']:,}")
     b.metric('Source event rate',f"{summary['event_rate']:.1%}")

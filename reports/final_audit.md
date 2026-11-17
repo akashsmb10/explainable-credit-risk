@@ -8,7 +8,7 @@
 | Model selection, calibration and explanation | PASS | Validation-only selection verified; TreeSHAP raw-margin additivity verified |
 | Executable SQL | PASS | 5 queries executed again and matched saved outputs |
 | Notebook execution | PASS | 8 notebooks with executed code cells and no error outputs |
-| Complete pytest suite and dashboard AppTest | PASS | 28 tests passed, including all Streamlit pages and slider endpoint |
+| Complete pytest suite and dashboard AppTest | PASS | 29 tests passed, including all Streamlit pages and slider endpoint |
 | Streamlit HTTP launch and health | PASS | Local server health and HTML endpoint returned HTTP 200; temporary process stopped after check |
 | README and reports numeric source consistency | PASS | 6 deterministic documents verified; headline metrics match saved sources at three decimals |
 | Unfinished implementation marker scan | PASS | No unresolved implementation markers in source, app, tests, SQL or documentation |

@@ -40,6 +40,12 @@ def run():
     assert clients.id.is_unique and all(len(d)==5 for d in clients.drivers)
     result=threshold_table(clients.event,clients.score.to_numpy(),[source['review_threshold']]).iloc[0]
     assert int(result.tp)==source['test_metrics']['tp'] and int(result.fn)==source['test_metrics']['fn']
+    tradeoffs=pd.read_csv(ROOT/'artifacts/tables/threshold_tradeoffs.csv')
+    policy=tradeoffs.iloc[(tradeoffs.threshold-source['review_threshold']).abs().argmin()]
+    bands=pd.read_csv(ROOT/'artifacts/tables/risk_bands.csv').set_index('risk_band')
+    takeaway={'review_rate':policy.review_rate,'event_capture':policy.event_capture,
+              'low_event_rate':bands.loc['LOW','event_rate'],'very_high_event_rate':bands.loc['VERY HIGH','event_rate']}
+    for key,value in takeaway.items(): np.testing.assert_allclose(snapshot['business_takeaway'][key],value,atol=1e-14)
     record('Public snapshot integrity',f'{len(clients)} scores, events and driver records match saved holdout outputs; policy counts match')
     paths=[ROOT/'README.md',*sorted((ROOT/'docs').glob('*.md')),*sorted((ROOT/'reports').glob('*.md'))]
     links=0
