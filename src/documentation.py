@@ -126,9 +126,9 @@ PSI compares train-derived bins with random holdouts; a synthetic credit-limit s
 
 ## Architecture and artifacts
 
-`src/`: reusable audit, feature, modeling, evaluation, calibration, explainability, decision, statistics and orchestration modules. `notebooks/`: executed narrative notebooks covering the analysis. `sql/`: executable DuckDB portfolio, segmentation, monitoring, decile and exposure queries. `app/`: seven-page Streamlit dashboard loading saved artifacts. `tests/`: core logic, leakage and dashboard tests. `docs/`: dataset and scope. `reports/`: executive summary, model card, findings, interview guide, verified resume and execution audit. `config/`: explicit assumptions. `artifacts/tables/run_summary.json`: numerical source of truth. Models, raw/processed data, database and virtual environment are ignored; small tables, reports, figures and notebook outputs are intentionally shareable. Review data attribution before redistributing.
+`src/`: reusable audit, feature, modeling, evaluation, calibration, explainability, decision, statistics and orchestration modules. `notebooks/`: executed narrative notebooks covering the analysis. `sql/`: executable DuckDB portfolio, segmentation, monitoring, decile and exposure queries. `app/`: seven-page Streamlit dashboard loading saved artifacts. `tests/`: core logic, leakage and dashboard tests. `docs/`: dataset and scope. `reports/`: executive summary, model card, findings and execution audit. `config/`: explicit assumptions. `artifacts/tables/run_summary.json`: numerical source of truth. Models, raw/processed data, database and virtual environment are ignored; small tables, reports, figures and notebook outputs are intentionally shareable. Review data attribution before redistributing.
 
-Useful reading: [model card](reports/model_card.md), [interview guide](reports/interview_guide.md), [resume bullets](reports/resume_bullets.md), [final audit](reports/final_audit.md). All empirical headline metrics are rendered by code from the executed artifacts; the final audit verifies consistency and saved prediction replay.
+Useful reading: [model card](reports/model_card.md), [final audit](reports/final_audit.md). All empirical headline metrics are rendered by code from the executed artifacts; the final audit verifies consistency and saved prediction replay.
 """
     write('docs/technical_methodology.md',README.replace('](reports/','](../reports/').replace('](artifacts/','](../artifacts/'))
     from .presentation import readme
@@ -211,15 +211,3 @@ Undocumented education records: {s['undocumented_education_rows']}; undocumented
 
 Full schema, extrema/cardinalities/missingness: `data_audit.csv`. Numerical quantiles: `numerical_distributions.csv`. Outliers are retained with regularized shallow trees and scaling for logistic; no arbitrary winsorization or negative-bill deletion. Duplicate full rows: {s['duplicate_rows']}; duplicate profiles are grouped, not silently removed. Dataset lacks income, employment, new requested-loan amount, LGD, EAD and recovery data.
 """)
-    write('reports/resume_bullets.md',f"""# Retail Credit Risk & Explainable Loan Decision Engine
-
-Technology: Python, pandas, SciPy, statsmodels, scikit-learn, XGBoost, SHAP, DuckDB, SQL, Streamlit, pytest.
-
-- Built a reproducible credit-risk analysis pipeline for {s['rows']:,} public cardholder records, with duplicate-profile holdouts and train-only preprocessing.
-- Compared baseline, logistic and XGBoost models with independent calibration; selected {selected}, achieving held-out ROC-AUC {metrics['roc_auc']:.4f}, average precision {metrics['average_precision']:.4f} and Brier {metrics['brier']:.4f}.
-- Developed SQL-backed segmentation, SHAP explanations and a review simulation capturing {policy.event_capture:.2%} of holdout events at a {policy.review_rate:.2%} review rate, with clearly assumed loss scenarios.
-
-Traceability: `artifacts/tables/run_summary.json` for source/model metrics; `artifacts/tables/threshold_tradeoffs.csv` at the summary's review threshold for simulation rates. These are portfolio experiments, not bank deployment or profit impact.
-""")
-    from .interview import write_guide
-    write_guide(s)

@@ -137,7 +137,7 @@ sql/                     Executed DuckDB analytical queries
 tests/                   Feature, leakage, decision and dashboard tests
 artifacts/figures/       Generated analytical figures
 artifacts/tables/        Shareable evidence and execution summaries
-reports/                 Model card, findings, interview preparation and audit
+reports/                 Model card, findings and audit
 site/                    Static interactive public demo and saved result snapshot
 scripts/                 Repository publication and presentation checks
 ```
@@ -156,8 +156,6 @@ Risk-band thresholds express a validation-derived review-capacity scenario. LGD 
 | [Technical methodology](docs/technical_methodology.md) | Complete modeling, calibration and statistical rationale |
 | [Data dictionary](docs/data_dictionary.md) | Source schema, code issues and audit findings |
 | [Model card](reports/model_card.md) | Intended use, validation, fairness and monitoring limitations |
-| [Interview guide](reports/interview_guide.md) | Questions, concise answers and deeper technical follow-ups |
-| [Verified resume bullets](reports/resume_bullets.md) | Three concise claims linked to executed evidence |
 | [Final audit](reports/final_audit.md) | Reproduction and verification results |
 | [Publication checks](reports/publication_audit.md) | Exported-score consistency, links and upload hygiene |
 
