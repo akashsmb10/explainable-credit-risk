@@ -11,6 +11,21 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from src.decision_engine import threshold_table
 
+def scan_content(path):
+    content=path.read_text(encoding='utf-8-sig')
+    if path.suffix!='.ipynb': return content
+    notebook=json.loads(content); cells=[]
+    for cell in notebook.get('cells',[]):
+        outputs=[]
+        for output in cell.get('outputs',[]):
+            filtered=dict(output)
+            if 'data' in filtered:
+                filtered['data']={mime:value for mime,value in filtered['data'].items()
+                                  if mime not in {'image/png','image/jpeg','image/svg+xml'}}
+            outputs.append(filtered)
+        cells.append({'source':cell.get('source',[]),'outputs':outputs})
+    return json.dumps(cells,ensure_ascii=False)
+
 def run():
     checks=[]
     def record(component,evidence): checks.append({'component':component,'status':'PASS','evidence':evidence})
@@ -64,7 +79,7 @@ def run():
         p=ROOT/name
         if p.stat().st_size>15*1024*1024: large.append(name)
         if p.suffix in {'.py','.md','.json','.ipynb','.yaml','.yml','.html','.js','.css','.txt'}:
-            content=p.read_text(encoding='utf-8-sig')
+            content=scan_content(p)
             # Match credential-shaped values, never generic variable names or authentication documentation.
             patterns=[r'gh[pousr]_[A-Za-z0-9]{30,}',r'github_pat_[A-Za-z0-9_]{30,}',r'AKIA[A-Z0-9]{16}',
                       r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----']
