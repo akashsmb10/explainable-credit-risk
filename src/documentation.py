@@ -8,8 +8,13 @@ def table(frame):
     head='| '+' | '.join(map(str,frame.columns))+' |\n'
     line='| '+' | '.join(['---']*len(frame.columns))+' |\n'
     rows=[]
+    rounded={'roc_auc','average_precision','ks','brier','ROC-AUC','Average precision','KS','Brier score','Gini'}
     for row in frame.itertuples(index=False,name=None):
-        rows.append('| '+' | '.join((f'{x:.3e}' if 0<abs(x)<1e-4 else f'{x:.4f}') if isinstance(x,float) else str(x) for x in row)+' |')
+        values=[]
+        for column,x in zip(frame.columns,row):
+            precision=3 if column in rounded or ('metric' in frame.columns and row[0] in rounded) else 4
+            values.append((f'{x:.3e}' if precision==4 and 0<abs(x)<1e-4 else f'{x:.{precision}f}') if isinstance(x,float) else str(x))
+        rows.append('| '+' | '.join(values)+' |')
     return head+line+'\n'.join(rows)
 
 def write_documentation(s):
@@ -37,13 +42,13 @@ def write_documentation(s):
         f"Interpretation: {'evidence against H0 at the declared conventional significance level' if r.p_holm<.05 else 'insufficient evidence against H0 at the declared conventional significance level'}; this does not measure causal effects. "
         f"Business relevance: {reasons[r.feature]}"
         for r in stats.itertuples())
-    empirical=f"""Executed source audit: {s['rows']:,} clients, {s['events']:,} positive events ({s['event_rate']:.2%}), {s['missing_cells']} missing cells, {s['duplicate_profiles']} duplicate predictor profiles, {s['negative_bill_cells']} negative bill cells. Source file SHA256: `{s['source_sha256']}`.
+    empirical=f"""Executed source audit: {s['rows']:,} clients, {s['events']:,} positive events ({s['event_rate']:.1%}), {s['missing_cells']} missing cells, {s['duplicate_profiles']} duplicate predictor profiles, {s['negative_bill_cells']} negative bill cells. Source file SHA256: `{s['source_sha256']}`.
 
-The predeclared validation-Brier selection rule selected **{selected}**. Test ROC-AUC **{metrics['roc_auc']:.4f}**, average precision **{metrics['average_precision']:.4f}**, KS **{metrics['ks']:.4f}**, Brier **{metrics['brier']:.4f}**. At the validation-derived review threshold **{s['review_threshold']:.6f}**, precision is **{metrics['precision']:.4f}**, recall **{metrics['recall']:.4f}**, F1 **{metrics['f1']:.4f}**.
+The predeclared validation-Brier selection rule selected **{selected}**. Test ROC-AUC **{metrics['roc_auc']:.3f}**, average precision **{metrics['average_precision']:.3f}**, KS **{metrics['ks']:.3f}**, Brier **{metrics['brier']:.3f}**. At the validation-derived review threshold **{s['review_threshold']:.6f}**, precision is **{metrics['precision']:.4f}**, recall **{metrics['recall']:.4f}**, F1 **{metrics['f1']:.4f}**.
 
-The simulated acceptance fraction on the untouched test is **{policy.simulated_acceptance_rate:.2%}**; accepted clients' observed event rate is **{policy.accepted_event_rate:.2%}**. Review captures **{policy.event_capture:.2%}** of observed events. These are retrospective same-sample simulations, not realized approval or profit impacts.
+The simulated acceptance fraction on the untouched test is **{policy.simulated_acceptance_rate:.1%}**; accepted clients' observed event rate is **{policy.accepted_event_rate:.1%}**. Review captures **{policy.event_capture:.1%}** of observed events. These are retrospective same-sample simulations, not realized approval or profit impacts.
 
-Calibration is not claimed to improve every holdout metric: the selected model's raw test Brier is **{raw_brier:.6f}**, versus selected-mapping Brier **{metrics['brier']:.6f}**. Selection remains based on the independent validation result; test differences are reported without switching winners.
+Calibration is not claimed to improve every holdout metric: the selected model's raw test Brier is **{raw_brier:.3f}**, versus selected-mapping Brier **{metrics['brier']:.3f}**. Selection remains based on the independent validation result; test differences are reported without switching winners.
 """
     partitions=pd.DataFrame([{'partition':k,**v} for k,v in s['partitions'].items()])
     README=f"""# Retail Credit Risk & Explainable Loan Decision Engine
@@ -150,7 +155,7 @@ Input schema: `src.features.BASE`. Demographics and ID are excluded; engineering
 
 ## Calibration and boundaries
 
-Selected mapping: `{selected}`. Calibration is fitted on calibration clients; validation selects the model/map and review capacity. Test Brier {metrics['brier']:.6f}. See the full calibration comparison and reliability intervals. Boundaries `{s['band_boundaries']}`; review threshold {s['review_threshold']:.6f}. Band policy is a relative-risk/review-capacity scenario, not an economically optimal approval rule.
+Selected mapping: `{selected}`. Calibration is fitted on calibration clients; validation selects the model/map and review capacity. Test Brier {metrics['brier']:.3f}. See the full calibration comparison and reliability intervals. Boundaries `{s['band_boundaries']}`; review threshold {s['review_threshold']:.6f}. Band policy is a relative-risk/review-capacity scenario, not an economically optimal approval rule.
 
 ## Fairness and limitations
 

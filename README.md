@@ -25,21 +25,23 @@ Python · scikit-learn · XGBoost · SHAP · DuckDB / SQL · Streamlit · pytest
 | Evidence | Executed result |
 | --- | --- |
 | Source clients | 30,000 |
-| Positive events | 6,636 (22.12%) |
+| Positive events | 6,636 (22.1%) |
 | Final test clients | 6,010 |
 | Selected model | Sigmoid-calibrated XGBoost |
-| Test ROC-AUC / average precision | 0.7808 / 0.5591 |
-| Test KS / Brier score | 0.4302 / 0.1325 |
-| Review rate / event capture | 24.08% / 57.31% |
-| Event rate in simulated acceptance group | 12.29% |
+| Test ROC-AUC / average precision | 0.781 / 0.559 |
+| Test KS / Brier score | 0.430 / 0.133 |
+| Review rate / event capture | 24.1% / 57.3% |
+| Event rate in simulated acceptance group | 12.3% |
+
+Figures are from the saved run; re-running on another OS/XGBoost build can shift them by about ±0.001 (logistic results reproduce exactly).
 
 **Calibration nuance:** sigmoid calibration won on validation Brier. Raw XGBoost had a slightly better Brier on the final test holdout; this is disclosed rather than changing the selected model after seeing test results.
 
 | Model / probability mapping | ROC-AUC | Average precision | Brier score |
 | --- | --- | --- | --- |
-| base_rate:raw | 0.5000 | 0.2186 | 0.1708 |
-| logistic:raw | 0.7634 | 0.5373 | 0.1355 |
-| xgboost:sigmoid | 0.7808 | 0.5591 | 0.1325 |
+| base_rate:raw | 0.500 | 0.219 | 0.171 |
+| logistic:raw | 0.763 | 0.537 | 0.135 |
+| xgboost:sigmoid | 0.781 | 0.559 | 0.133 |
 
 All empirical figures come from executed code. [Run summary](artifacts/tables/run_summary.json), [full model comparisons](artifacts/tables/test_models.csv), [threshold trade-offs](artifacts/tables/threshold_tradeoffs.csv) and [confidence intervals](artifacts/tables/test_confidence_intervals.csv) provide traceability. Review figures are retrospective simulations, not actual approvals or profit improvements.
 

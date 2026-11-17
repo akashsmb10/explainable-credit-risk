@@ -10,7 +10,7 @@ Home Credit is richer but requires competition access and multiple large relatio
 
 ## Executed source audit
 
-Executed source audit: 30,000 clients, 6,636 positive events (22.12%), 0 missing cells, 56 duplicate predictor profiles, 3932 negative bill cells. Source file SHA256: `30c6be3abd8dcfd3e6096c828bad8c2f011238620f5369220bd60cfc82700933`.
+Executed source audit: 30,000 clients, 6,636 positive events (22.1%), 0 missing cells, 56 duplicate predictor profiles, 3932 negative bill cells. Source file SHA256: `30c6be3abd8dcfd3e6096c828bad8c2f011238620f5369220bd60cfc82700933`.
 
 
 

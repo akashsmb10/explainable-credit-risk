@@ -10,7 +10,7 @@
 | Notebook execution | PASS | 8 notebooks with executed code cells and no error outputs |
 | Complete pytest suite and dashboard AppTest | PASS | 28 tests passed, including all Streamlit pages and slider endpoint |
 | Streamlit HTTP launch and health | PASS | Local server health and HTML endpoint returned HTTP 200; temporary process stopped after check |
-| README and reports numeric source consistency | PASS | 6 deterministic documents verified against saved numeric sources |
+| README and reports numeric source consistency | PASS | 6 deterministic documents verified; headline metrics match saved sources at three decimals |
 | Unfinished implementation marker scan | PASS | No unresolved implementation markers in source, app, tests, SQL or documentation |
 | Reproducible dependencies | PASS | Pinned direct packages match environment and pip check has no dependency conflicts; full requirements-lock.txt recorded |
 | File paths, README commands and ignore rules | PASS | README local links, entry points and required data/model/environment ignore rules verified |

@@ -6,13 +6,13 @@ This project asks how a risk analyst can prioritize existing cardholders for rev
 
 ## Verified results
 
-Executed source audit: 30,000 clients, 6,636 positive events (22.12%), 0 missing cells, 56 duplicate predictor profiles, 3932 negative bill cells. Source file SHA256: `30c6be3abd8dcfd3e6096c828bad8c2f011238620f5369220bd60cfc82700933`.
+Executed source audit: 30,000 clients, 6,636 positive events (22.1%), 0 missing cells, 56 duplicate predictor profiles, 3932 negative bill cells. Source file SHA256: `30c6be3abd8dcfd3e6096c828bad8c2f011238620f5369220bd60cfc82700933`.
 
-The predeclared validation-Brier selection rule selected **xgboost:sigmoid**. Test ROC-AUC **0.7808**, average precision **0.5591**, KS **0.4302**, Brier **0.1325**. At the validation-derived review threshold **0.283990**, precision is **0.5204**, recall **0.5731**, F1 **0.5455**.
+The predeclared validation-Brier selection rule selected **xgboost:sigmoid**. Test ROC-AUC **0.781**, average precision **0.559**, KS **0.430**, Brier **0.133**. At the validation-derived review threshold **0.283990**, precision is **0.5204**, recall **0.5731**, F1 **0.5455**.
 
-The simulated acceptance fraction on the untouched test is **75.92%**; accepted clients' observed event rate is **12.29%**. Review captures **57.31%** of observed events. These are retrospective same-sample simulations, not realized approval or profit impacts.
+The simulated acceptance fraction on the untouched test is **75.9%**; accepted clients' observed event rate is **12.3%**. Review captures **57.3%** of observed events. These are retrospective same-sample simulations, not realized approval or profit impacts.
 
-Calibration is not claimed to improve every holdout metric: the selected model's raw test Brier is **0.132463**, versus selected-mapping Brier **0.132508**. Selection remains based on the independent validation result; test differences are reported without switching winners.
+Calibration is not claimed to improve every holdout metric: the selected model's raw test Brier is **0.132**, versus selected-mapping Brier **0.133**. Selection remains based on the independent validation result; test differences are reported without switching winners.
 
 
 ![Risk bands](../artifacts/figures/risk_bands.png)
@@ -56,33 +56,33 @@ Validation results:
 
 | candidate | roc_auc | average_precision | brier | log_loss |
 | --- | --- | --- | --- | --- |
-| xgboost:sigmoid | 0.7782 | 0.5369 | 0.1401 | 0.4405 |
-| xgboost:raw | 0.7782 | 0.5369 | 0.1403 | 0.4412 |
-| xgboost:isotonic | 0.7777 | 0.5177 | 0.1407 | 0.4427 |
-| logistic:isotonic | 0.7574 | 0.4916 | 0.1433 | 0.4629 |
-| logistic:sigmoid | 0.7589 | 0.5080 | 0.1433 | 0.4524 |
-| logistic:raw | 0.7589 | 0.5080 | 0.1437 | 0.4541 |
-| base_rate:raw | 0.5000 | 0.2259 | 0.1749 | 0.5344 |
+| xgboost:sigmoid | 0.778 | 0.537 | 0.140 | 0.4405 |
+| xgboost:raw | 0.778 | 0.537 | 0.140 | 0.4412 |
+| xgboost:isotonic | 0.778 | 0.518 | 0.141 | 0.4427 |
+| logistic:isotonic | 0.757 | 0.492 | 0.143 | 0.4629 |
+| logistic:sigmoid | 0.759 | 0.508 | 0.143 | 0.4524 |
+| logistic:raw | 0.759 | 0.508 | 0.144 | 0.4541 |
+| base_rate:raw | 0.500 | 0.226 | 0.175 | 0.5344 |
 
 Test results (descriptive, never used for selection):
 
 | candidate | roc_auc | average_precision | brier | log_loss |
 | --- | --- | --- | --- | --- |
-| base_rate:raw | 0.5000 | 0.2186 | 0.1708 | 0.5252 |
-| logistic:raw | 0.7634 | 0.5373 | 0.1355 | 0.4355 |
-| logistic:sigmoid | 0.7634 | 0.5373 | 0.1356 | 0.4354 |
-| logistic:isotonic | 0.7614 | 0.5128 | 0.1355 | 0.4340 |
-| xgboost:raw | 0.7808 | 0.5591 | 0.1325 | 0.4242 |
-| xgboost:sigmoid | 0.7808 | 0.5591 | 0.1325 | 0.4242 |
-| xgboost:isotonic | 0.7799 | 0.5365 | 0.1328 | 0.4260 |
+| base_rate:raw | 0.500 | 0.219 | 0.171 | 0.5252 |
+| logistic:raw | 0.763 | 0.537 | 0.135 | 0.4355 |
+| logistic:sigmoid | 0.763 | 0.537 | 0.136 | 0.4354 |
+| logistic:isotonic | 0.761 | 0.513 | 0.135 | 0.4340 |
+| xgboost:raw | 0.781 | 0.559 | 0.132 | 0.4242 |
+| xgboost:sigmoid | 0.781 | 0.559 | 0.133 | 0.4242 |
+| xgboost:isotonic | 0.780 | 0.536 | 0.133 | 0.4260 |
 
 Confidence intervals:
 
 | metric | ci_low | ci_high |
 | --- | --- | --- |
-| roc_auc | 0.7680 | 0.7945 |
-| average_precision | 0.5347 | 0.5928 |
-| brier | 0.1269 | 0.1372 |
+| roc_auc | 0.768 | 0.794 |
+| average_precision | 0.535 | 0.593 |
+| brier | 0.127 | 0.137 |
 
 Good calibration means that a group scored at a given event probability has roughly that event frequency under the same population and target horizon. It does not guarantee an individual outcome. Rank performance and probability quality can differ; isotonic's ties may alter ranking. Test reliability bins include Wilson event-rate intervals and deciles compare scores with outcomes.
 

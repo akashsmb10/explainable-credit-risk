@@ -44,7 +44,7 @@ if page=='Portfolio Overview':
     a.metric('Source clients',f"{summary['rows']:,}")
     b.metric('Source event rate',f"{summary['event_rate']:.1%}")
     c.metric('Test ROC-AUC',f"{summary['test_metrics']['roc_auc']:.3f}")
-    d.metric('Test Brier',f"{summary['test_metrics']['brier']:.4f}")
+    d.metric('Test Brier',f"{summary['test_metrics']['brier']:.3f}")
     st.subheader('Portfolio evidence')
     st.dataframe(csv('sql_01_portfolio_overview.csv'),hide_index=True,width='stretch')
     st.info('Train/calibration/validation rows are not independent evaluation results. Dashboard applicant, threshold and risk pages use the final test holdout. Credit limits are observed NT-dollar amounts, not exposure at default.')

@@ -125,7 +125,15 @@ def run():
         before={p:p.read_bytes() for p in paths if p.name not in exclude}
         write_documentation(summary)
         assert all(p.read_bytes()==content for p,content in before.items())
-        return f'{len(before)} deterministic documents verified against saved numeric sources'
+        m=summary['test_metrics']
+        readme=(ROOT/'README.md').read_text(encoding='utf-8')
+        assert f"| Test ROC-AUC / average precision | {m['roc_auc']:.3f} / {m['average_precision']:.3f} |" in readme
+        assert f"| Test KS / Brier score | {m['ks']:.3f} / {m['brier']:.3f} |" in readme
+        for name in ['executive_summary.md','model_card.md']:
+            text=(ROOT/'reports'/name).read_text(encoding='utf-8')
+            for label,key in [('Test ROC-AUC','roc_auc'),('average precision','average_precision'),('KS','ks'),('Brier','brier')]:
+                assert f"{label} **{m[key]:.3f}**" in text
+        return f'{len(before)} deterministic documents verified; headline metrics match saved sources at three decimals'
     check('README and reports numeric source consistency',documents)
     def placeholders():
         import re

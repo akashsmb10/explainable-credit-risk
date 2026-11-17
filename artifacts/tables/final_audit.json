@@ -42,7 +42,7 @@
   {
     "component": "README and reports numeric source consistency",
     "status": "PASS",
-    "evidence": "6 deterministic documents verified against saved numeric sources"
+    "evidence": "6 deterministic documents verified; headline metrics match saved sources at three decimals"
   },
   {
     "component": "Unfinished implementation marker scan",

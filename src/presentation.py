@@ -47,13 +47,15 @@ Python · scikit-learn · XGBoost · SHAP · DuckDB / SQL · Streamlit · pytest
 | Evidence | Executed result |
 | --- | --- |
 | Source clients | {summary['rows']:,} |
-| Positive events | {summary['events']:,} ({summary['event_rate']:.2%}) |
+| Positive events | {summary['events']:,} ({summary['event_rate']:.1%}) |
 | Final test clients | {summary['partitions']['test']['n']:,} |
 | Selected model | Sigmoid-calibrated XGBoost |
-| Test ROC-AUC / average precision | {m['roc_auc']:.4f} / {m['average_precision']:.4f} |
-| Test KS / Brier score | {m['ks']:.4f} / {m['brier']:.4f} |
-| Review rate / event capture | {policy.review_rate:.2%} / {policy.event_capture:.2%} |
-| Event rate in simulated acceptance group | {policy.accepted_event_rate:.2%} |
+| Test ROC-AUC / average precision | {m['roc_auc']:.3f} / {m['average_precision']:.3f} |
+| Test KS / Brier score | {m['ks']:.3f} / {m['brier']:.3f} |
+| Review rate / event capture | {policy.review_rate:.1%} / {policy.event_capture:.1%} |
+| Event rate in simulated acceptance group | {policy.accepted_event_rate:.1%} |
+
+Figures are from the saved run; re-running on another OS/XGBoost build can shift them by about ±0.001 (logistic results reproduce exactly).
 
 **Calibration nuance:** sigmoid calibration won on validation Brier. Raw XGBoost had a slightly better Brier on the final test holdout; this is disclosed rather than changing the selected model after seeing test results.
 
