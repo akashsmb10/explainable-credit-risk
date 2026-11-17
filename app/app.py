@@ -18,7 +18,7 @@ section[data-testid="stSidebar"] {background:#e7eef5;}
 </style>''',unsafe_allow_html=True)
 st.title('Retail Credit Risk Studio')
 st.caption('Historical evidence · Explainable scoring · Decision trade-offs')
-st.warning('Educational portfolio decision-support simulation. Not an actual bank underwriting system or ICICI lending recommendation. Scores estimate the UCI payment-event label; losses use assumed LGD and EAD in NT dollars.')
+st.warning('Educational portfolio decision-support simulation. Not an actual bank underwriting system or bank lending recommendation. Scores estimate the UCI payment-event label; losses use assumed LGD and EAD in NT dollars.')
 
 @st.cache_data
 def artifacts():

@@ -10,7 +10,7 @@ Python · scikit-learn · XGBoost · SHAP · DuckDB / SQL · Streamlit · pytest
 
 ![Interactive dashboard preview](site/assets/dashboard-preview.png)
 
-> Educational decision support using historical public cardholder data. This project does not recommend ICICI lending policy. Its scores estimate the dataset's payment-event label, not bank-grade Indian loan PD.
+> Educational decision support using historical public cardholder data. This project does not recommend any bank's lending policy. Its scores estimate the dataset's payment-event label, not bank-grade Indian loan PD.
 
 ## What this project demonstrates
 

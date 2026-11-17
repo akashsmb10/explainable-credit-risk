@@ -50,7 +50,7 @@ Calibration is not claimed to improve every holdout metric: the selected model's
 
 An educational banking analytics portfolio: historical repayment data → statistical understanding → risk ranking → probability calibration → explainability → review-capacity simulation → assumed-loss scenarios → monitoring demonstrations.
 
-This project asks how a risk analyst can prioritize existing cardholders for review while distinguishing predictive evidence from business assumptions. It does not recommend ICICI lending policy.
+This project asks how a risk analyst can prioritize existing cardholders for review while distinguishing predictive evidence from business assumptions. It does not recommend any bank's lending policy.
 
 ## Verified results
 
