@@ -40,6 +40,20 @@ def bootstrap(y, p, repetitions=300, seed=42):
     return pd.DataFrame({'metric':['roc_auc','average_precision','brier'],
                          'ci_low':np.quantile(rows,.025,axis=0), 'ci_high':np.quantile(rows,.975,axis=0)})
 
+def paired_auc_bootstrap(y, logistic, xgboost, repetitions, seed):
+    y, logistic, xgboost = np.asarray(y), np.asarray(logistic), np.asarray(xgboost)
+    rng = np.random.default_rng(seed); differences=[]
+    for _ in range(repetitions):
+        idx = rng.integers(0, len(y), len(y))
+        if len(np.unique(y[idx])) == 2:
+            differences.append(roc_auc_score(y[idx],xgboost[idx])-roc_auc_score(y[idx],logistic[idx]))
+    if not differences: raise ValueError('No bootstrap resample contains both event classes')
+    return {'point_estimate':float(roc_auc_score(y,xgboost)-roc_auc_score(y,logistic)),
+            'mean_difference':float(np.mean(differences)),
+            'ci_low':float(np.quantile(differences,.025)), 'ci_high':float(np.quantile(differences,.975)),
+            'share_le_zero':float(np.mean(np.asarray(differences)<=0)),
+            'repetitions':repetitions,'valid_replicates':len(differences),'seed':seed}
+
 def psi(reference, current):
     edges = np.unique(np.quantile(reference, np.linspace(0, 1, 11)))
     edges[0], edges[-1] = -np.inf, np.inf

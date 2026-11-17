@@ -8,8 +8,13 @@ def table(frame):
     head='| '+' | '.join(map(str,frame.columns))+' |\n'
     line='| '+' | '.join(['---']*len(frame.columns))+' |\n'
     rows=[]
+    rounded={'roc_auc','average_precision','ks','brier','ROC-AUC','Average precision','KS','Brier score','Gini'}
     for row in frame.itertuples(index=False,name=None):
-        rows.append('| '+' | '.join((f'{x:.3e}' if 0<abs(x)<1e-4 else f'{x:.4f}') if isinstance(x,float) else str(x) for x in row)+' |')
+        values=[]
+        for column,x in zip(frame.columns,row):
+            precision=3 if column in rounded or ('metric' in frame.columns and row[0] in rounded) else 4
+            values.append((f'{x:.3e}' if precision==4 and 0<abs(x)<1e-4 else f'{x:.{precision}f}') if isinstance(x,float) else str(x))
+        rows.append('| '+' | '.join(values)+' |')
     return head+line+'\n'.join(rows)
 
 def write_documentation(s):
@@ -37,20 +42,20 @@ def write_documentation(s):
         f"Interpretation: {'evidence against H0 at the declared conventional significance level' if r.p_holm<.05 else 'insufficient evidence against H0 at the declared conventional significance level'}; this does not measure causal effects. "
         f"Business relevance: {reasons[r.feature]}"
         for r in stats.itertuples())
-    empirical=f"""Executed source audit: {s['rows']:,} clients, {s['events']:,} positive events ({s['event_rate']:.2%}), {s['missing_cells']} missing cells, {s['duplicate_profiles']} duplicate predictor profiles, {s['negative_bill_cells']} negative bill cells. Source file SHA256: `{s['source_sha256']}`.
+    empirical=f"""Executed source audit: {s['rows']:,} clients, {s['events']:,} positive events ({s['event_rate']:.1%}), {s['missing_cells']} missing cells, {s['duplicate_profiles']} duplicate predictor profiles, {s['negative_bill_cells']} negative bill cells. Source file SHA256: `{s['source_sha256']}`.
 
-The predeclared validation-Brier selection rule selected **{selected}**. Test ROC-AUC **{metrics['roc_auc']:.4f}**, average precision **{metrics['average_precision']:.4f}**, KS **{metrics['ks']:.4f}**, Brier **{metrics['brier']:.4f}**. At the validation-derived review threshold **{s['review_threshold']:.6f}**, precision is **{metrics['precision']:.4f}**, recall **{metrics['recall']:.4f}**, F1 **{metrics['f1']:.4f}**.
+The predeclared validation-Brier selection rule selected **{selected}**. Test ROC-AUC **{metrics['roc_auc']:.3f}**, average precision **{metrics['average_precision']:.3f}**, KS **{metrics['ks']:.3f}**, Brier **{metrics['brier']:.3f}**. At the validation-derived review threshold **{s['review_threshold']:.6f}**, precision is **{metrics['precision']:.4f}**, recall **{metrics['recall']:.4f}**, F1 **{metrics['f1']:.4f}**.
 
-The simulated acceptance fraction on the untouched test is **{policy.simulated_acceptance_rate:.2%}**; accepted clients' observed event rate is **{policy.accepted_event_rate:.2%}**. Review captures **{policy.event_capture:.2%}** of observed events. These are retrospective same-sample simulations, not realized approval or profit impacts.
+The simulated acceptance fraction on the untouched test is **{policy.simulated_acceptance_rate:.1%}**; accepted clients' observed event rate is **{policy.accepted_event_rate:.1%}**. Review captures **{policy.event_capture:.1%}** of observed events. These are retrospective same-sample simulations, not realized approval or profit impacts.
 
-Calibration is not claimed to improve every holdout metric: the selected model's raw test Brier is **{raw_brier:.6f}**, versus selected-mapping Brier **{metrics['brier']:.6f}**. Selection remains based on the independent validation result; test differences are reported without switching winners.
+Calibration is not claimed to improve every holdout metric: the selected model's raw test Brier is **{raw_brier:.3f}**, versus selected-mapping Brier **{metrics['brier']:.3f}**. Selection remains based on the independent validation result; test differences are reported without switching winners.
 """
     partitions=pd.DataFrame([{'partition':k,**v} for k,v in s['partitions'].items()])
     README=f"""# Retail Credit Risk & Explainable Loan Decision Engine
 
 An educational banking analytics portfolio: historical repayment data → statistical understanding → risk ranking → probability calibration → explainability → review-capacity simulation → assumed-loss scenarios → monitoring demonstrations.
 
-This project asks how a risk analyst can prioritize existing cardholders for review while distinguishing predictive evidence from business assumptions. It does not recommend ICICI lending policy.
+This project asks how a risk analyst can prioritize existing cardholders for review while distinguishing predictive evidence from business assumptions. It does not recommend any bank's lending policy.
 
 ## Verified results
 
@@ -67,8 +72,10 @@ py -3.12 -m venv .venv
 .\\.venv\\Scripts\\python.exe -m pip install -r requirements-lock.txt
 .\\.venv\\Scripts\\python.exe -m src.pipeline --clean
 .\\.venv\\Scripts\\python.exe -m src.notebooks
+.\\.venv\\Scripts\\python.exe -m src.web_demo
 .\\.venv\\Scripts\\python.exe -m pytest -q
 .\\.venv\\Scripts\\python.exe -m src.final_audit
+.\\.venv\\Scripts\\python.exe scripts/release_audit.py
 .\\.venv\\Scripts\\python.exe -m streamlit run app/app.py
 ```
 
@@ -126,9 +133,9 @@ PSI compares train-derived bins with random holdouts; a synthetic credit-limit s
 
 ## Architecture and artifacts
 
-`src/`: reusable audit, feature, modeling, evaluation, calibration, explainability, decision, statistics and orchestration modules. `notebooks/`: executed narrative notebooks covering the analysis. `sql/`: executable DuckDB portfolio, segmentation, monitoring, decile and exposure queries. `app/`: seven-page Streamlit dashboard loading saved artifacts. `tests/`: core logic, leakage and dashboard tests. `docs/`: dataset and scope. `reports/`: executive summary, model card, findings, interview guide, verified resume and execution audit. `config/`: explicit assumptions. `artifacts/tables/run_summary.json`: numerical source of truth. Models, raw/processed data, database and virtual environment are ignored; small tables, reports, figures and notebook outputs are intentionally shareable. Review data attribution before redistributing.
+`src/`: reusable audit, feature, modeling, evaluation, calibration, explainability, decision, statistics and orchestration modules. `notebooks/`: executed narrative notebooks covering the analysis. `sql/`: executable DuckDB portfolio, segmentation, monitoring, decile and exposure queries. `app/`: seven-page Streamlit dashboard loading saved artifacts. `tests/`: core logic, leakage and dashboard tests. `docs/`: dataset and scope. `reports/`: executive summary, model card, findings and execution audit. `config/`: explicit assumptions. `artifacts/tables/run_summary.json`: numerical source of truth. Models, raw/processed data, database and virtual environment are ignored; small tables, reports, figures and notebook outputs are intentionally shareable. Review data attribution before redistributing.
 
-Useful reading: [model card](reports/model_card.md), [interview guide](reports/interview_guide.md), [resume bullets](reports/resume_bullets.md), [final audit](reports/final_audit.md). All empirical headline metrics are rendered by code from the executed artifacts; the final audit verifies consistency and saved prediction replay.
+Useful reading: [model card](reports/model_card.md), [final audit](reports/final_audit.md). All empirical headline metrics are rendered by code from the executed artifacts; the final audit verifies consistency and saved prediction replay.
 """
     write('docs/technical_methodology.md',README.replace('](reports/','](../reports/').replace('](artifacts/','](../artifacts/'))
     from .presentation import readme
@@ -150,7 +157,7 @@ Input schema: `src.features.BASE`. Demographics and ID are excluded; engineering
 
 ## Calibration and boundaries
 
-Selected mapping: `{selected}`. Calibration is fitted on calibration clients; validation selects the model/map and review capacity. Test Brier {metrics['brier']:.6f}. See the full calibration comparison and reliability intervals. Boundaries `{s['band_boundaries']}`; review threshold {s['review_threshold']:.6f}. Band policy is a relative-risk/review-capacity scenario, not an economically optimal approval rule.
+Selected mapping: `{selected}`. Calibration is fitted on calibration clients; validation selects the model/map and review capacity. Test Brier {metrics['brier']:.3f}. See the full calibration comparison and reliability intervals. Boundaries `{s['band_boundaries']}`; review threshold {s['review_threshold']:.6f}. Band policy is a relative-risk/review-capacity scenario, not an economically optimal approval rule.
 
 ## Fairness and limitations
 
@@ -211,15 +218,3 @@ Undocumented education records: {s['undocumented_education_rows']}; undocumented
 
 Full schema, extrema/cardinalities/missingness: `data_audit.csv`. Numerical quantiles: `numerical_distributions.csv`. Outliers are retained with regularized shallow trees and scaling for logistic; no arbitrary winsorization or negative-bill deletion. Duplicate full rows: {s['duplicate_rows']}; duplicate profiles are grouped, not silently removed. Dataset lacks income, employment, new requested-loan amount, LGD, EAD and recovery data.
 """)
-    write('reports/resume_bullets.md',f"""# Retail Credit Risk & Explainable Loan Decision Engine
-
-Technology: Python, pandas, SciPy, statsmodels, scikit-learn, XGBoost, SHAP, DuckDB, SQL, Streamlit, pytest.
-
-- Built a reproducible credit-risk analysis pipeline for {s['rows']:,} public cardholder records, with duplicate-profile holdouts and train-only preprocessing.
-- Compared baseline, logistic and XGBoost models with independent calibration; selected {selected}, achieving held-out ROC-AUC {metrics['roc_auc']:.4f}, average precision {metrics['average_precision']:.4f} and Brier {metrics['brier']:.4f}.
-- Developed SQL-backed segmentation, SHAP explanations and a review simulation capturing {policy.event_capture:.2%} of holdout events at a {policy.review_rate:.2%} review rate, with clearly assumed loss scenarios.
-
-Traceability: `artifacts/tables/run_summary.json` for source/model metrics; `artifacts/tables/threshold_tradeoffs.csv` at the summary's review threshold for simulation rates. These are portfolio experiments, not bank deployment or profit impact.
-""")
-    from .interview import write_guide
-    write_guide(s)

@@ -1,8 +1,12 @@
 {
   "status": "PASS",
-  "target": "public deployment",
+  "target": "local demo",
+  "checked_utc": "2026-11-17T09:05:05.843546+00:00",
+  "snapshot_execution_utc": "2026-11-17T09:03:27.632650+00:00",
+  "source_sha256": "30c6be3abd8dcfd3e6096c828bad8c2f011238620f5369220bd60cfc82700933",
   "checks": [
     "Loaded snapshot matches executed source hash and test metrics",
+    "Artifact-backed retrospective takeaway rendered",
     "Desktop page rendered: overview",
     "Desktop page rendered: distribution",
     "Desktop page rendered: applicant",
@@ -10,6 +14,7 @@
     "Desktop page rendered: explainability",
     "Desktop page rendered: decisions",
     "Desktop page rendered: loss",
+    "All desktop chart images loaded successfully",
     "Frozen policy counts, threshold endpoints and exact reset passed",
     "Loss scaling, zero exposure and invalid negative-exposure handling passed",
     "Mobile page fits viewport: overview",

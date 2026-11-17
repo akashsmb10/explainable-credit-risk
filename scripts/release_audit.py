@@ -11,6 +11,21 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from src.decision_engine import threshold_table
 
+def scan_content(path):
+    content=path.read_text(encoding='utf-8-sig')
+    if path.suffix!='.ipynb': return content
+    notebook=json.loads(content); cells=[]
+    for cell in notebook.get('cells',[]):
+        outputs=[]
+        for output in cell.get('outputs',[]):
+            filtered=dict(output)
+            if 'data' in filtered:
+                filtered['data']={mime:value for mime,value in filtered['data'].items()
+                                  if mime not in {'image/png','image/jpeg','image/svg+xml'}}
+            outputs.append(filtered)
+        cells.append({'source':cell.get('source',[]),'outputs':outputs})
+    return json.dumps(cells,ensure_ascii=False)
+
 def run():
     checks=[]
     def record(component,evidence): checks.append({'component':component,'status':'PASS','evidence':evidence})
@@ -25,6 +40,12 @@ def run():
     assert clients.id.is_unique and all(len(d)==5 for d in clients.drivers)
     result=threshold_table(clients.event,clients.score.to_numpy(),[source['review_threshold']]).iloc[0]
     assert int(result.tp)==source['test_metrics']['tp'] and int(result.fn)==source['test_metrics']['fn']
+    tradeoffs=pd.read_csv(ROOT/'artifacts/tables/threshold_tradeoffs.csv')
+    policy=tradeoffs.iloc[(tradeoffs.threshold-source['review_threshold']).abs().argmin()]
+    bands=pd.read_csv(ROOT/'artifacts/tables/risk_bands.csv').set_index('risk_band')
+    takeaway={'review_rate':policy.review_rate,'event_capture':policy.event_capture,
+              'low_event_rate':bands.loc['LOW','event_rate'],'very_high_event_rate':bands.loc['VERY HIGH','event_rate']}
+    for key,value in takeaway.items(): np.testing.assert_allclose(snapshot['business_takeaway'][key],value,atol=1e-14)
     record('Public snapshot integrity',f'{len(clients)} scores, events and driver records match saved holdout outputs; policy counts match')
     paths=[ROOT/'README.md',*sorted((ROOT/'docs').glob('*.md')),*sorted((ROOT/'reports').glob('*.md'))]
     links=0
@@ -64,7 +85,7 @@ def run():
         p=ROOT/name
         if p.stat().st_size>15*1024*1024: large.append(name)
         if p.suffix in {'.py','.md','.json','.ipynb','.yaml','.yml','.html','.js','.css','.txt'}:
-            content=p.read_text(encoding='utf-8-sig')
+            content=scan_content(p)
             # Match credential-shaped values, never generic variable names or authentication documentation.
             patterns=[r'gh[pousr]_[A-Za-z0-9]{30,}',r'github_pat_[A-Za-z0-9_]{30,}',r'AKIA[A-Z0-9]{16}',
                       r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----']
@@ -80,8 +101,10 @@ def run():
     (ROOT/'artifacts/tables/release_audit.json').write_text(json.dumps(summary,indent=2),encoding='utf-8')
     report='# Publication checks\n\n| Component | Status | Evidence |\n| --- | --- | --- |\n'
     report+='\n'.join(f"| {r['component']} | {r['status']} | {r['evidence']} |" for r in checks)
-    report+='\n\nThis scan checks intentional upload files and saved-result consistency. Browser rendering, slider/scenario behavior and HTTP deployment verification are recorded separately in the browser and deployment audit artifacts. It is not a security certification.\n'
+    report+='\n\nThis scan checks intentional upload files and saved-result consistency. Fresh local browser checks are recorded separately in browser_audit.json when run. Live deployment verification remains pending unless the current snapshot is deployed and independently inspected; historical publication metadata is not verification of this branch. It is not a security certification.\n'
     (ROOT/'reports/publication_audit.md').write_text(report,encoding='utf-8')
+    from src.final_audit import write_manifest
+    write_manifest()
     print(json.dumps(summary,indent=2))
 
 if __name__=='__main__': run()

@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import sys
 import threading
+from datetime import datetime, timezone
 from playwright.sync_api import sync_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -37,13 +38,23 @@ def check(base_url=None):
             assert actual['source_sha256']==expected['source_sha256']
             assert actual['test_metrics']==expected['test_metrics']
             checks.append('Loaded snapshot matches executed source hash and test metrics')
+            snapshot=json.loads((ROOT/'site/data.json').read_text())
+            takeaway=snapshot['business_takeaway']
+            sentence=(f"In a retrospective simulation, reviewing the riskiest {takeaway['review_rate']:.1%} of holdout accounts "
+                      f"captured {takeaway['event_capture']:.1%} of next-month payment events; risk bands rise from "
+                      f"{takeaway['low_event_rate']:.1%} to {takeaway['very_high_event_rate']:.1%} observed event rate.")
+            assert sentence in page.locator('#content').inner_text()
+            checks.append('Artifact-backed retrospective takeaway rendered')
             page.screenshot(path=str(ROOT/'site/assets/dashboard-preview.png'),full_page=True)
             for name in ['overview','distribution','applicant','performance','explainability','decisions','loss']:
                 page.locator(f'button[data-page="{name}"]').click()
                 page.wait_for_function('(name)=>document.querySelector(`button[data-page="${name}"]`).getAttribute("aria-current")==="page"',arg=name)
                 assert page.locator('h1').count()==1
+                page.locator('#content img').evaluate_all("images=>images.forEach(image=>image.loading='eager')")
+                page.wait_for_function("Array.from(document.querySelectorAll('#content img')).every(image=>image.complete && image.naturalWidth>0)")
                 assert page.locator('body').evaluate('(e)=>e.scrollWidth <= window.innerWidth')
                 checks.append(f'Desktop page rendered: {name}')
+            checks.append('All desktop chart images loaded successfully')
             page.locator('button[data-page="decisions"]').click()
             page.wait_for_selector('#threshold')
             frozen=page.evaluate('decision(D.summary.review_threshold)')
@@ -79,6 +90,8 @@ def check(base_url=None):
     finally:
         if server: server.shutdown();server.server_close()
     result={'status':'PASS','target':'public deployment' if base_url.startswith('https://') else 'local demo',
+            'checked_utc':datetime.now(timezone.utc).isoformat(),
+            'snapshot_execution_utc':expected['execution_utc'],'source_sha256':expected['source_sha256'],
             'checks':checks,'page_errors':errors}
     (ROOT/'artifacts/tables/browser_audit.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
     print(json.dumps(result,indent=2))

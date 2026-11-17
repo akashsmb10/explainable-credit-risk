@@ -1,0 +1,10 @@
+{
+  "point_estimate": 0.017478928924256842,
+  "mean_difference": 0.017208687832310443,
+  "ci_low": 0.010089567959505722,
+  "ci_high": 0.025154341707519873,
+  "share_le_zero": 0.0,
+  "repetitions": 300,
+  "valid_replicates": 300,
+  "seed": 42
+}

@@ -19,6 +19,14 @@ from .evaluation import metrics
 from .decision_engine import expected_loss, risk_bands
 from .documentation import write_documentation
 
+def write_manifest():
+    # Manifest links source code and outputs without sensitive environment paths.
+    paths=[p for directory in ['src','app','tests','sql','docs','config','reports','notebooks','artifacts/tables','artifacts/figures']
+           for p in (ROOT/directory).rglob('*') if p.is_file() and p.suffix not in {'.pyc','.duckdb'}]
+    manifest={str(p.relative_to(ROOT)).replace('\\','/'):hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in paths if p.name!='artifact_manifest.json'}
+    (ROOT/'artifacts/tables/artifact_manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
+
 def run():
     rows=[]; tables=ROOT/'artifacts/tables'
     def check(name,fn):
@@ -121,14 +129,21 @@ def run():
     def documents():
         # Regeneration must produce the same documents from the same executed source of truth.
         paths=[ROOT/'README.md',*sorted((ROOT/'reports').glob('*.md'))]
-        exclude={'final_audit.md','completion_report.md'}
+        exclude={'final_audit.md'}
         before={p:p.read_bytes() for p in paths if p.name not in exclude}
         write_documentation(summary)
         assert all(p.read_bytes()==content for p,content in before.items())
-        assert (ROOT/'reports/interview_guide.md').read_text().count('### Q')>=40
-        assert (ROOT/'reports/resume_bullets.md').read_text().count('\n- ')==3
-        return f'{len(before)} deterministic documents verified; interview guide and exactly three resume bullets checked'
-    check('README, reports and resume numeric source consistency',documents)
+        m=summary['test_metrics']
+        readme=(ROOT/'README.md').read_text(encoding='utf-8')
+        assert f"| Selected model | {summary['selected']} |" in readme
+        assert f"| Test ROC-AUC / average precision | {m['roc_auc']:.3f} / {m['average_precision']:.3f} |" in readme
+        assert f"| Test KS / Brier score | {m['ks']:.3f} / {m['brier']:.3f} |" in readme
+        for name in ['executive_summary.md','model_card.md']:
+            text=(ROOT/'reports'/name).read_text(encoding='utf-8')
+            for label,key in [('Test ROC-AUC','roc_auc'),('average precision','average_precision'),('KS','ks'),('Brier','brier')]:
+                assert f"{label} **{m[key]:.3f}**" in text
+        return f'{len(before)} deterministic documents verified; headline metrics match saved sources at three decimals'
+    check('README and reports numeric source consistency',documents)
     def placeholders():
         import re
         problems=[]
@@ -178,15 +193,7 @@ def run():
     report+='\n'.join(f"| {r['component']} | {r['status']} | {r['evidence'].replace('|','/').replace(chr(10),' ')} |" for r in rows)
     report+='\n\nThe pipeline regenerates downstream artifacts from the source without loading old models. Notebooks execute against these artifacts and rerun SQL. Clean reproduction is additionally checked by the agent during finalization. HTTP verification and AppTest are programmatic checks, not full browser accessibility or security certification. Figures are generated from executed artifacts. Statistical and fairness limitations are in the model card. Empirical reporting is deterministic from saved executed tables; this check does not claim independent external validation.\n'
     (ROOT/'reports/final_audit.md').write_text(report,encoding='utf-8')
-    if all(row['status']=='PASS' for row in rows):
-        from .completion import write_completion
-        write_completion()
-    # Manifest links source code and outputs without sensitive environment paths.
-    paths=[p for directory in ['src','app','tests','sql','docs','config','reports','notebooks','artifacts/tables','artifacts/figures']
-           for p in (ROOT/directory).rglob('*') if p.is_file() and p.suffix not in {'.pyc','.duckdb'}]
-    manifest={str(p.relative_to(ROOT)).replace('\\','/'):hashlib.sha256(p.read_bytes()).hexdigest()
-              for p in paths if p.name!='artifact_manifest.json'}
-    (tables/'artifact_manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
+    write_manifest()
     for row in rows: print(row['status'],row['component'],row['evidence'],flush=True)
     if any(row['status']=='FAIL' for row in rows): raise SystemExit(1)
 

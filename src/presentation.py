@@ -20,6 +20,10 @@ def readme(summary):
     chosen=model_comparison[model_comparison.candidate.isin(['base_rate:raw','logistic:raw',summary['selected']])]
     compact=chosen[['candidate','roc_auc','average_precision','brier']].rename(columns={
         'candidate':'Model / probability mapping','roc_auc':'ROC-AUC','average_precision':'Average precision','brier':'Brier score'})
+    challengers=pd.read_csv(tables/'champion_challenger.csv')
+    comparison=json.loads((tables/'champion_challenger_bootstrap.json').read_text())
+    challenger_table=challengers[['model','roc_auc','gini','ks','brier','decile_inversions']].rename(columns={
+        'model':'Model','roc_auc':'ROC-AUC','gini':'Gini','ks':'KS','brier':'Brier score','decile_inversions':'Decile inversions'})
     return f"""# Explainable Credit Risk
 
 ### Retail Credit Risk & Explainable Loan Decision Engine
@@ -32,7 +36,7 @@ Python · scikit-learn · XGBoost · SHAP · DuckDB / SQL · Streamlit · pytest
 
 ![Interactive dashboard preview](site/assets/dashboard-preview.png)
 
-> Educational decision support using historical public cardholder data. This project does not recommend ICICI lending policy. Its scores estimate the dataset's payment-event label, not bank-grade Indian loan PD.
+> Educational decision support using historical public cardholder data. This project does not recommend any bank's lending policy. Its scores estimate the dataset's payment-event label, not bank-grade Indian loan PD.
 
 ## What this project demonstrates
 
@@ -47,19 +51,29 @@ Python · scikit-learn · XGBoost · SHAP · DuckDB / SQL · Streamlit · pytest
 | Evidence | Executed result |
 | --- | --- |
 | Source clients | {summary['rows']:,} |
-| Positive events | {summary['events']:,} ({summary['event_rate']:.2%}) |
+| Positive events | {summary['events']:,} ({summary['event_rate']:.1%}) |
 | Final test clients | {summary['partitions']['test']['n']:,} |
-| Selected model | Sigmoid-calibrated XGBoost |
-| Test ROC-AUC / average precision | {m['roc_auc']:.4f} / {m['average_precision']:.4f} |
-| Test KS / Brier score | {m['ks']:.4f} / {m['brier']:.4f} |
-| Review rate / event capture | {policy.review_rate:.2%} / {policy.event_capture:.2%} |
-| Event rate in simulated acceptance group | {policy.accepted_event_rate:.2%} |
+| Selected model | {summary['selected']} |
+| Test ROC-AUC / average precision | {m['roc_auc']:.3f} / {m['average_precision']:.3f} |
+| Test KS / Brier score | {m['ks']:.3f} / {m['brier']:.3f} |
+| Review rate / event capture | {policy.review_rate:.1%} / {policy.event_capture:.1%} |
+| Event rate in simulated acceptance group | {policy.accepted_event_rate:.1%} |
+
+Figures are from the saved run; re-running on another OS/XGBoost build can shift them by about ±0.001 (logistic results reproduce exactly).
 
 **Calibration nuance:** sigmoid calibration won on validation Brier. Raw XGBoost had a slightly better Brier on the final test holdout; this is disclosed rather than changing the selected model after seeing test results.
 
 {table(compact)}
 
 All empirical figures come from executed code. [Run summary](artifacts/tables/run_summary.json), [full model comparisons](artifacts/tables/test_models.csv), [threshold trade-offs](artifacts/tables/threshold_tradeoffs.csv) and [confidence intervals](artifacts/tables/test_confidence_intervals.csv) provide traceability. Review figures are retrospective simulations, not actual approvals or profit improvements.
+
+## Champion–challenger: logistic vs XGBoost
+
+{table(challenger_table)}
+
+XGBoost ranks risk better by ΔAUC {comparison['point_estimate']:.3f} [{comparison['ci_low']:.3f}, {comparison['ci_high']:.3f}] (95% paired-bootstrap interval). Logistic regression rank-orders the deciles more smoothly and is directly interpretable. In a regulated scoring setting, logistic would be the natural champion and XGBoost a challenger.
+
+This compares frozen raw probabilities on the test partition for reporting only; the validation-selected model remains `{summary['selected']}`. Deciles contain equal counts by score rank, from low to high risk; tied scores use source row order. An inversion is an adjacent decline in observed event rate. [Model and decile evidence](artifacts/tables/champion_challenger.csv) and [paired-bootstrap results](artifacts/tables/champion_challenger_bootstrap.json) include the mean ΔAUC and share of replicates at or below zero. Intervals condition on these fitted models and this split.
 
 ## Explore the evidence
 
@@ -99,8 +113,10 @@ py -3.12 -m venv .venv
 .\\.venv\\Scripts\\python.exe -m pip install -r requirements-lock.txt
 .\\.venv\\Scripts\\python.exe -m src.pipeline --clean
 .\\.venv\\Scripts\\python.exe -m src.notebooks
-.\\.venv\\Scripts\\python.exe -m src.final_audit
 .\\.venv\\Scripts\\python.exe -m src.web_demo
+.\\.venv\\Scripts\\python.exe -m pytest -q
+.\\.venv\\Scripts\\python.exe -m src.final_audit
+.\\.venv\\Scripts\\python.exe scripts/release_audit.py
 .\\.venv\\Scripts\\python.exe -m streamlit run app/app.py
 ```
 
@@ -114,8 +130,10 @@ python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements-lock.txt
 .venv/bin/python -m src.pipeline --clean
 .venv/bin/python -m src.notebooks
-.venv/bin/python -m src.final_audit
 .venv/bin/python -m src.web_demo
+.venv/bin/python -m pytest -q
+.venv/bin/python -m src.final_audit
+.venv/bin/python scripts/release_audit.py
 .venv/bin/python -m streamlit run app/app.py
 ```
 
@@ -137,7 +155,7 @@ sql/                     Executed DuckDB analytical queries
 tests/                   Feature, leakage, decision and dashboard tests
 artifacts/figures/       Generated analytical figures
 artifacts/tables/        Shareable evidence and execution summaries
-reports/                 Model card, findings, interview preparation and audit
+reports/                 Model card, findings and audit
 site/                    Static interactive public demo and saved result snapshot
 scripts/                 Repository publication and presentation checks
 ```
@@ -156,8 +174,6 @@ Risk-band thresholds express a validation-derived review-capacity scenario. LGD 
 | [Technical methodology](docs/technical_methodology.md) | Complete modeling, calibration and statistical rationale |
 | [Data dictionary](docs/data_dictionary.md) | Source schema, code issues and audit findings |
 | [Model card](reports/model_card.md) | Intended use, validation, fairness and monitoring limitations |
-| [Interview guide](reports/interview_guide.md) | Questions, concise answers and deeper technical follow-ups |
-| [Verified resume bullets](reports/resume_bullets.md) | Three concise claims linked to executed evidence |
 | [Final audit](reports/final_audit.md) | Reproduction and verification results |
 | [Publication checks](reports/publication_audit.md) | Exported-score consistency, links and upload hygiene |
 

@@ -4,13 +4,13 @@
 
 **A reproducible banking analytics portfolio that turns repayment histories into explainable risk estimates and transparent review simulations.**
 
-[**Open live interactive demo ↗**](https://akashsmb10.github.io/explainable-credit-risk/) · [Model card](reports/model_card.md) · [Executive summary](reports/executive_summary.md) · [Technical methodology](docs/technical_methodology.md)
+**Interactive demo:** prepared for GitHub Pages; publication is not yet verified. · [Model card](reports/model_card.md) · [Executive summary](reports/executive_summary.md) · [Technical methodology](docs/technical_methodology.md)
 
 Python · scikit-learn · XGBoost · SHAP · DuckDB / SQL · Streamlit · pytest
 
 ![Interactive dashboard preview](site/assets/dashboard-preview.png)
 
-> Educational decision support using historical public cardholder data. This project does not recommend ICICI lending policy. Its scores estimate the dataset's payment-event label, not bank-grade Indian loan PD.
+> Educational decision support using historical public cardholder data. This project does not recommend any bank's lending policy. Its scores estimate the dataset's payment-event label, not bank-grade Indian loan PD.
 
 ## What this project demonstrates
 
@@ -25,23 +25,36 @@ Python · scikit-learn · XGBoost · SHAP · DuckDB / SQL · Streamlit · pytest
 | Evidence | Executed result |
 | --- | --- |
 | Source clients | 30,000 |
-| Positive events | 6,636 (22.12%) |
+| Positive events | 6,636 (22.1%) |
 | Final test clients | 6,010 |
-| Selected model | Sigmoid-calibrated XGBoost |
-| Test ROC-AUC / average precision | 0.7808 / 0.5591 |
-| Test KS / Brier score | 0.4302 / 0.1325 |
-| Review rate / event capture | 24.08% / 57.31% |
-| Event rate in simulated acceptance group | 12.29% |
+| Selected model | xgboost:sigmoid |
+| Test ROC-AUC / average precision | 0.781 / 0.559 |
+| Test KS / Brier score | 0.430 / 0.133 |
+| Review rate / event capture | 24.1% / 57.3% |
+| Event rate in simulated acceptance group | 12.3% |
+
+Figures are from the saved run; re-running on another OS/XGBoost build can shift them by about ±0.001 (logistic results reproduce exactly).
 
 **Calibration nuance:** sigmoid calibration won on validation Brier. Raw XGBoost had a slightly better Brier on the final test holdout; this is disclosed rather than changing the selected model after seeing test results.
 
 | Model / probability mapping | ROC-AUC | Average precision | Brier score |
 | --- | --- | --- | --- |
-| base_rate:raw | 0.5000 | 0.2186 | 0.1708 |
-| logistic:raw | 0.7634 | 0.5373 | 0.1355 |
-| xgboost:sigmoid | 0.7808 | 0.5591 | 0.1325 |
+| base_rate:raw | 0.500 | 0.219 | 0.171 |
+| logistic:raw | 0.763 | 0.537 | 0.135 |
+| xgboost:sigmoid | 0.781 | 0.559 | 0.133 |
 
 All empirical figures come from executed code. [Run summary](artifacts/tables/run_summary.json), [full model comparisons](artifacts/tables/test_models.csv), [threshold trade-offs](artifacts/tables/threshold_tradeoffs.csv) and [confidence intervals](artifacts/tables/test_confidence_intervals.csv) provide traceability. Review figures are retrospective simulations, not actual approvals or profit improvements.
+
+## Champion–challenger: logistic vs XGBoost
+
+| Model | ROC-AUC | Gini | KS | Brier score | Decile inversions |
+| --- | --- | --- | --- | --- | --- |
+| logistic | 0.763 | 0.527 | 0.419 | 0.135 | 0 |
+| xgboost | 0.781 | 0.562 | 0.430 | 0.132 | 1 |
+
+XGBoost ranks risk better by ΔAUC 0.017 [0.010, 0.025] (95% paired-bootstrap interval). Logistic regression rank-orders the deciles more smoothly and is directly interpretable. In a regulated scoring setting, logistic would be the natural champion and XGBoost a challenger.
+
+This compares frozen raw probabilities on the test partition for reporting only; the validation-selected model remains `xgboost:sigmoid`. Deciles contain equal counts by score rank, from low to high risk; tied scores use source row order. An inversion is an adjacent decline in observed event rate. [Model and decile evidence](artifacts/tables/champion_challenger.csv) and [paired-bootstrap results](artifacts/tables/champion_challenger_bootstrap.json) include the mean ΔAUC and share of replicates at or below zero. Intervals condition on these fitted models and this split.
 
 ## Explore the evidence
 
@@ -81,8 +94,10 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
 .\.venv\Scripts\python.exe -m src.pipeline --clean
 .\.venv\Scripts\python.exe -m src.notebooks
-.\.venv\Scripts\python.exe -m src.final_audit
 .\.venv\Scripts\python.exe -m src.web_demo
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe -m src.final_audit
+.\.venv\Scripts\python.exe scripts/release_audit.py
 .\.venv\Scripts\python.exe -m streamlit run app/app.py
 ```
 
@@ -96,8 +111,10 @@ python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements-lock.txt
 .venv/bin/python -m src.pipeline --clean
 .venv/bin/python -m src.notebooks
-.venv/bin/python -m src.final_audit
 .venv/bin/python -m src.web_demo
+.venv/bin/python -m pytest -q
+.venv/bin/python -m src.final_audit
+.venv/bin/python scripts/release_audit.py
 .venv/bin/python -m streamlit run app/app.py
 ```
 
@@ -119,7 +136,7 @@ sql/                     Executed DuckDB analytical queries
 tests/                   Feature, leakage, decision and dashboard tests
 artifacts/figures/       Generated analytical figures
 artifacts/tables/        Shareable evidence and execution summaries
-reports/                 Model card, findings, interview preparation and audit
+reports/                 Model card, findings and audit
 site/                    Static interactive public demo and saved result snapshot
 scripts/                 Repository publication and presentation checks
 ```
@@ -138,8 +155,6 @@ Risk-band thresholds express a validation-derived review-capacity scenario. LGD 
 | [Technical methodology](docs/technical_methodology.md) | Complete modeling, calibration and statistical rationale |
 | [Data dictionary](docs/data_dictionary.md) | Source schema, code issues and audit findings |
 | [Model card](reports/model_card.md) | Intended use, validation, fairness and monitoring limitations |
-| [Interview guide](reports/interview_guide.md) | Questions, concise answers and deeper technical follow-ups |
-| [Verified resume bullets](reports/resume_bullets.md) | Three concise claims linked to executed evidence |
 | [Final audit](reports/final_audit.md) | Reproduction and verification results |
 | [Publication checks](reports/publication_audit.md) | Exported-score consistency, links and upload hygiene |
 

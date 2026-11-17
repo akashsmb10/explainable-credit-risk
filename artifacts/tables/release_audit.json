@@ -8,7 +8,7 @@
     {
       "component": "Markdown presentation",
       "status": "PASS",
-      "evidence": "35 local document/image links verified; UTF-8 characters checked"
+      "evidence": "33 local document/image links verified; UTF-8 characters checked"
     },
     {
       "component": "Public demo assets and scope",
@@ -18,7 +18,7 @@
     {
       "component": "Upload hygiene",
       "status": "PASS",
-      "evidence": "131 candidate files checked: no environment/raw-model artifacts, credential-shaped values, local user paths or files above size limit"
+      "evidence": "126 candidate files checked: no environment/raw-model artifacts, credential-shaped values, local user paths or files above size limit"
     },
     {
       "component": "Licensing and exclusions",

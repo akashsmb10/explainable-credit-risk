@@ -123,3 +123,35 @@ def test_explanations_cover_all_test_clients():
     explanations=pd.read_csv(ROOT/'artifacts/tables/shap_local.csv')
     assert set(predictions.ID)==set(explanations.ID)
     assert explanations.ID.is_unique
+
+def test_champion_challenger_reporting_preserves_selection(bundle,tmp_path):
+    from src.pipeline import export_champion_challenger
+    tables=ROOT/'artifacts/tables'
+    summary_path=tables/'run_summary.json'; before=summary_path.read_bytes()
+    summary=json.loads(before)
+    comparison=pd.read_csv(tables/'champion_challenger.csv').set_index('model')
+    assert set(comparison.index)=={'logistic','xgboost'}
+    np.testing.assert_allclose(comparison.gini,2*comparison.roc_auc-1,atol=1e-15)
+    bootstrap=json.loads((tables/'champion_challenger_bootstrap.json').read_text())
+    difference=comparison.loc['xgboost','roc_auc']-comparison.loc['logistic','roc_auc']
+    assert bootstrap['point_estimate']==pytest.approx(difference)
+    assert bootstrap['ci_low']<=difference<=bootstrap['ci_high']
+    models=joblib.load(ROOT/'artifacts/models/benchmark_models.joblib')
+    test=pd.read_csv(tables/'test_predictions.csv')
+    export_champion_challenger(models,test,summary['configuration'],tmp_path)
+    pd.testing.assert_frame_equal(comparison,pd.read_csv(tmp_path/'champion_challenger.csv').set_index('model'))
+    assert json.loads((tmp_path/'champion_challenger_bootstrap.json').read_text())==bootstrap
+    assert summary_path.read_bytes()==before
+    validation=pd.read_csv(tables/'validation_models.csv')
+    assert summary['selected']==bundle['winner']==validation.sort_values(['brier','log_loss','candidate']).iloc[0].candidate
+
+
+def test_paired_auc_bootstrap_identical_predictions():
+    from src.evaluation import paired_auc_bootstrap
+    y=np.array([0,1,0,1,0,1,0,1])
+    p=np.linspace(.1,.8,len(y))
+    result=paired_auc_bootstrap(y,p,p,repetitions=40,seed=42)
+    for key in ['point_estimate','mean_difference','ci_low','ci_high']:
+        assert result[key]==0
+    assert result['share_le_zero']==1
+    assert 0<result['valid_replicates']<=result['repetitions']

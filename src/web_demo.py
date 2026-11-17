@@ -8,6 +8,12 @@ def build():
     tables=ROOT/'artifacts/tables'; output=ROOT/'site'
     output.mkdir(exist_ok=True); (output/'assets').mkdir(exist_ok=True)
     summary=json.loads((tables/'run_summary.json').read_text())
+    tradeoffs=pd.read_csv(tables/'threshold_tradeoffs.csv')
+    policy=tradeoffs.iloc[(tradeoffs.threshold-summary['review_threshold']).abs().argmin()]
+    bands=pd.read_csv(tables/'risk_bands.csv').set_index('risk_band')
+    takeaway={'review_rate':float(policy.review_rate),'event_capture':float(policy.event_capture),
+              'low_event_rate':float(bands.loc['LOW','event_rate']),
+              'very_high_event_rate':float(bands.loc['VERY HIGH','event_rate'])}
     clients=pd.read_csv(tables/'test_predictions.csv').sort_values('ID')
     explanations=pd.read_csv(tables/'shap_local.csv').set_index('ID')
     feature_names=[c for c in explanations.columns if c not in ['base_log_odds','raw_log_odds']]
@@ -20,7 +26,7 @@ def build():
                      'bill':float(row.BILL_AMT1),'payment':float(row.PAY_AMT1),'drivers':drivers})
     def records(name):
         return json.loads(pd.read_csv(tables/name).to_json(orient='records'))
-    payload={'summary':summary,'clients':rows,'models':records('test_models.csv'),
+    payload={'summary':summary,'business_takeaway':takeaway,'clients':rows,'models':records('test_models.csv'),
              'validation_models':records('validation_models.csv'),'intervals':records('test_confidence_intervals.csv'),
              'bands':records('risk_bands.csv'),'deciles':records('deciles.csv'),
              'global_drivers':records('shap_global.csv'),'subgroups':records('subgroup_metrics.csv'),

@@ -32,7 +32,7 @@
   {
     "component": "Complete pytest suite and dashboard AppTest",
     "status": "PASS",
-    "evidence": "28 tests passed, including all Streamlit pages and slider endpoint"
+    "evidence": "30 tests passed, including all Streamlit pages and slider endpoint"
   },
   {
     "component": "Streamlit HTTP launch and health",
@@ -40,9 +40,9 @@
     "evidence": "Local server health and HTML endpoint returned HTTP 200; temporary process stopped after check"
   },
   {
-    "component": "README, reports and resume numeric source consistency",
+    "component": "README and reports numeric source consistency",
     "status": "PASS",
-    "evidence": "8 deterministic documents verified; interview guide and exactly three resume bullets checked"
+    "evidence": "6 deterministic documents verified; headline metrics match saved sources at three decimals"
   },
   {
     "component": "Unfinished implementation marker scan",

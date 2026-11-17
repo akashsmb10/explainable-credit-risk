@@ -18,7 +18,7 @@ section[data-testid="stSidebar"] {background:#e7eef5;}
 </style>''',unsafe_allow_html=True)
 st.title('Retail Credit Risk Studio')
 st.caption('Historical evidence · Explainable scoring · Decision trade-offs')
-st.warning('Educational portfolio decision-support simulation. Not an actual bank underwriting system or ICICI lending recommendation. Scores estimate the UCI payment-event label; losses use assumed LGD and EAD in NT dollars.')
+st.warning('Educational portfolio decision-support simulation. Not an actual bank underwriting system or bank lending recommendation. Scores estimate the UCI payment-event label; losses use assumed LGD and EAD in NT dollars.')
 
 @st.cache_data
 def artifacts():
@@ -40,11 +40,15 @@ def csv(name): return pd.read_csv(ROOT/'artifacts/tables'/name)
 def picture(name): st.image(str(ROOT/'artifacts/figures'/name),width='stretch')
 
 if page=='Portfolio Overview':
+    tradeoffs=csv('threshold_tradeoffs.csv')
+    policy=tradeoffs.iloc[(tradeoffs.threshold-summary['review_threshold']).abs().argmin()]
+    bands=csv('risk_bands.csv').set_index('risk_band')
+    st.write(f"In a retrospective simulation, reviewing the riskiest {policy.review_rate:.1%} of holdout accounts captured {policy.event_capture:.1%} of next-month payment events; risk bands rise from {bands.loc['LOW','event_rate']:.1%} to {bands.loc['VERY HIGH','event_rate']:.1%} observed event rate.")
     a,b,c,d=st.columns(4)
     a.metric('Source clients',f"{summary['rows']:,}")
     b.metric('Source event rate',f"{summary['event_rate']:.1%}")
     c.metric('Test ROC-AUC',f"{summary['test_metrics']['roc_auc']:.3f}")
-    d.metric('Test Brier',f"{summary['test_metrics']['brier']:.4f}")
+    d.metric('Test Brier',f"{summary['test_metrics']['brier']:.3f}")
     st.subheader('Portfolio evidence')
     st.dataframe(csv('sql_01_portfolio_overview.csv'),hide_index=True,width='stretch')
     st.info('Train/calibration/validation rows are not independent evaluation results. Dashboard applicant, threshold and risk pages use the final test holdout. Credit limits are observed NT-dollar amounts, not exposure at default.')

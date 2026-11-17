@@ -45,7 +45,7 @@ On Windows the script uses installed Microsoft Edge if available. Otherwise inst
 
 ## Updating the public snapshot
 
-After changing model/data code, rerun the pipeline, notebooks and final audit, then export the snapshot and verify the browser controls. Commit source changes to `main`. The initial public release uses a separate `gh-pages` branch containing only the `site/` files. This deployment branch is published by GitHub Pages; it is independent of Python CI.
+After changing model/data code, rerun the pipeline, notebooks, web-demo export, tests, final audit and release audit, in that order. Verify the browser controls locally. Review source changes on a feature branch before merging through the normal review process. Pushing a feature branch does not deploy its snapshot. The initial public release uses a separate `gh-pages` branch containing only the `site/` files. This deployment branch is published by GitHub Pages; it is independent of Python CI.
 
 ```bash
 git subtree split --prefix site -b publish-site
